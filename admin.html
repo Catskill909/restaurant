@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Management - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        :root {
+            --dark-bg: #1a1a1a;
+            --darker-bg: #121212;
+            --accent: #e6c9a2;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --card-bg: #242424;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --warning: #ff9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background: var(--darker-bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-header h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: var(--darker-bg);
+        }
+
+        .btn.secondary {
+            background: var(--card-bg);
+            color: var(--text);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(230, 201, 162, 0.3);
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .menu-form-container {
+            background: var(--dark-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .menu-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--dark-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .image-upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            background: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .menu-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 500px;
+        }
+
+        .categories-list {
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="admin-header">
+            <h1>Menu Management</h1>
+            <div class="header-actions">
+                <button id="add-category-btn" class="btn secondary">
+                    <i class="fas fa-folder-plus"></i> Add Category
+                </button>
+                <a href="index.html" class="btn" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> View Site
+                </a>
+            </div>
+        </header>
+
+        <div class="admin-grid">
+            <!-- Add/Edit Form -->
+            <aside class="sidebar">
+                <div class="menu-form-container">
+                    <h2 id="form-title">Add Menu Item</h2>
+                    <form id="menu-form" class="menu-form">
+                        <input type="hidden" id="item-id">
+                        <div class="form-group">
+                            <label for="item-name">Item Name</label>
+                            <input type="text" id="item-name" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="item-category">Category</label>
+                            <select id="item-category" class="form-control" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-price">Price ($)</label>
+                            <input type="number" id="item-price" class="form-control" step="0.01" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-description">Description</label>
+                            <textarea id="item-description" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-image">Image</label>
+                            <div class="image-upload-container">
+                                <input type="file" id="item-image" accept="image/*" class="form-control">
+                                <div id="image-preview" class="image-preview">
+                                    <img src="https://via.placeholder.com/150" alt="Preview">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn primary">
+                                <i class="fas fa-save"></i> Save Item
+                            </button>
+                            <button type="button" id="cancel-edit" class="btn secondary" style="display: none;">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Menu Items Grid -->
+            <main class="main-content">
+                <div class="menu-categories" id="menu-categories">
+                    <!-- Categories will be dynamically inserted here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <h3>Manage Categories</h3>
+            <form id="category-form">
+                <div class="form-group">
+                    <label for="category-name">Category Name</label>
+                    <input type="text" id="category-name" class="form-control" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Add Category</button>
+                    <button type="button" class="btn secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+            <div id="categories-list" class="categories-list">
+                <!-- Existing categories will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
