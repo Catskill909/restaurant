@@ -50,20 +50,152 @@
             </div>
         </div>
     </section>
-
+<!-- Reservation Section -->
+<section id="reservation" class="reservation-section">
+    <div class="container">
+        <h2>Make a Reservation</h2>
+        <div class="reservation-grid">
+            <div class="restaurant-info">
+                <div class="hours-box">
+                    <h3>Dining Hours</h3>
+                    <ul class="hours-list">
+                        <li><span>Monday - Thursday:</span> 11:30 AM - 10:00 PM</li>
+                        <li><span>Friday - Saturday:</span> 11:30 AM - 11:00 PM</li>
+                        <li><span>Sunday:</span> 11:30 AM - 9:00 PM</li>
+                    </ul>
+                </div>
+                <div class="contact-box">
+                    <h3>Contact</h3>
+                    <p><i class="fas fa-phone"></i> (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> reservations@restaurant.com</p>
+                </div>
+            </div>
+            <div class="reservation-form">
+                <form id="reservationForm">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" required placeholder=" ">
+                        <label for="name">Full Name</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder=" ">
+                        <label for="email">Email</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="phone" name="phone" required placeholder=" ">
+                        <label for="phone">Phone Number</label>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="number" id="guests" name="guests" min="1" max="20" required placeholder=" ">
+                            <label for="guests">Number of Guests</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" id="date" name="date" required placeholder=" ">
+                            <label for="date">Date</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <select id="time" name="time" required>
+                            <option value="">Select Time</option>
+                            <option value="11:30">11:30 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="12:30">12:30 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="13:30">1:30 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="18:00">6:00 PM</option>
+                            <option value="18:30">6:30 PM</option>
+                            <option value="19:00">7:00 PM</option>
+                            <option value="19:30">7:30 PM</option>
+                            <option value="20:00">8:00 PM</option>
+                            <option value="20:30">8:30 PM</option>
+                        </select>
+                        <label for="time">Preferred Time</label>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="requests" name="requests" rows="3" placeholder=" "></textarea>
+                        <label for="requests">Special Requests (Optional)</label>
+                    </div>
+                    <button type="submit" class="btn-reserve">Make Reservation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
     <!-- Location Section -->
     <section id="location" class="location-section">
-        <h2>Find Us</h2>
-        <div id="map"></div>
-        <div class="address">
-            <h3>Our Address</h3>
-            <p>123 Restaurant Street<br>City, State 12345</p>
+        <div class="container">
+            <h2>Find Us</h2>
+            <div class="location-grid">
+                <div id="map" class="map-container"></div>
+                <div class="location-info">
+                    <div class="info-box">
+                        <h3>Our Address</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Restaurant Street<br>City, State 12345</p>
+                        <p><i class="fas fa-phone"></i> (555) 123-4567</p>
+                        <p><i class="fas fa-envelope"></i> info@restaurant.com</p>
+                    </div>
+                    <div class="directions-box">
+                        <h3>Getting Here</h3>
+                        <div class="transport-option">
+                            <i class="fas fa-car"></i>
+                            <div>
+                                <h4>By Car</h4>
+                                <p>Free parking available on premises</p>
+                            </div>
+                        </div>
+                        <div class="transport-option">
+                            <i class="fas fa-train"></i>
+                            <div>
+                                <h4>Public Transit</h4>
+                                <p>5 minute walk from Central Station</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 Restaurant Name. All rights reserved.</p>
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">Restaurant Name</div>
+                    <p class="footer-description">Experience culinary excellence in every bite</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#menu">Menu</a></li>
+                        <li><a href="#reservation">Reservations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-hours">
+                    <h4>Hours</h4>
+                    <ul>
+                        <li>Mon-Thu: 11:30 AM - 10:00 PM</li>
+                        <li>Fri-Sat: 11:30 AM - 11:00 PM</li>
+                        <li>Sun: 11:30 AM - 9:00 PM</li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Follow Us</h4>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-yelp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Restaurant Name. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>

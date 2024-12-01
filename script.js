@@ -12,6 +12,11 @@ function displayMenuItems() {
     // Clear the menu grid
     menuGrid.innerHTML = '';
     
+    // Create wrapper for two-column layout
+    const categoriesWrapper = document.createElement('div');
+    categoriesWrapper.className = 'menu-categories-wrapper';
+    menuGrid.appendChild(categoriesWrapper);
+    
     // Group items by category
     const itemsByCategory = items.reduce((acc, item) => {
         if (!acc[item.category]) {
@@ -21,86 +26,129 @@ function displayMenuItems() {
         return acc;
     }, {});
     
+    // Sort categories alphabetically
+    const sortedCategories = Object.entries(itemsByCategory).sort((a, b) => a[0].localeCompare(b[0]));
+    
     // Create a container for each category
-    Object.entries(itemsByCategory).forEach(([category, items]) => {
+    sortedCategories.forEach(([category, items]) => {
         if (items && items.length > 0) {
             const categorySection = document.createElement('div');
             categorySection.className = 'menu-category';
             
-            categorySection.innerHTML = `
-                <h2 class="category-title">${category}</h2>
-                <div class="menu-items">
-                    ${items.map(item => `
-                        <div class="menu-item">
-                            <div class="menu-item-image">
-                                <img src="${item.image}" 
-                                     alt="${item.name}" 
-                                     loading="lazy"
-                                     onerror="this.src='https://via.placeholder.com/150'">
-                            </div>
-                            <div class="menu-item-content">
-                                <h3 class="item-name">${item.name}</h3>
-                                <p class="description">${item.description || ''}</p>
-                                <p class="price">$${parseFloat(item.price).toFixed(2)}</p>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+            const categoryTitle = document.createElement('h2');
+            categoryTitle.className = 'category-title';
+            categoryTitle.textContent = category;
+            categorySection.appendChild(categoryTitle);
+
+            const menuItemsContainer = document.createElement('div');
+            menuItemsContainer.className = 'menu-items';
             
-            menuGrid.appendChild(categorySection);
+            items.forEach(item => {
+                menuItemsContainer.appendChild(createMenuItemElement(item));
+            });
+            
+            categorySection.appendChild(menuItemsContainer);
+            categoriesWrapper.appendChild(categorySection);
         }
     });
 
     // Show a message if no items are available
-    if (menuGrid.children.length === 0) {
+    if (categoriesWrapper.children.length === 0) {
         menuGrid.innerHTML = '<p class="no-items">No menu items available. Please check back later.</p>';
     }
 }
 
+function createMenuItemElement(item) {
+    const menuItem = document.createElement('div');
+    menuItem.className = 'menu-item';
+    menuItem.innerHTML = `
+        <div class="menu-item-image">
+            <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1760&q=80'}" alt="${item.name}">
+        </div>
+        <div class="menu-item-content">
+            <h3>${item.name}</h3>
+            <p>${item.description}</p>
+            <div class="menu-item-footer">
+                <span class="price">$${item.price.toFixed(2)}</span>
+            </div>
+        </div>
+    `;
+    return menuItem;
+}
+
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
-    // Clear any old menu data from previous versions
-    const oldKeys = ['menuData', 'menu', 'items'];
-    oldKeys.forEach(key => localStorage.removeItem(key));
-    
     displayMenuItems();
+    initMap();
     
-    // Initialize map if it exists
-    const mapElement = document.getElementById('map');
-    if (mapElement) {
-        const map = L.map('map').setView([51.505, -0.09], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: ' OpenStreetMap contributors'
-        }).addTo(map);
-        
-        // Add marker
-        L.marker([51.505, -0.09]).addTo(map)
-            .bindPopup('Our Restaurant<br>123 Restaurant Street')
-            .openPopup();
-    }
-
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-    });
-
-    // Handle contact form submission
-    document.querySelector('.contact-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Thank you for your message! We will get back to you soon.');
-        this.reset();
-    });
-
     // Listen for changes in localStorage
-    window.addEventListener('storage', function(e) {
+    window.addEventListener('storage', (e) => {
         if (e.key === 'menuItems') {
             displayMenuItems();
         }
     });
+
+    // Handle reservation form
+    const reservationForm = document.getElementById('reservationForm');
+    if (reservationForm) {
+        reservationForm.addEventListener('submit', handleReservation);
+    }
 });
+
+// Initialize the map
+function initMap() {
+    // Restaurant coordinates (replace with your actual coordinates)
+    const lat = 40.7128;
+    const lng = -74.0060;
+    
+    // Create map
+    const map = L.map('map').setView([lat, lng], 15);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: ' OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Add marker for restaurant location
+    const marker = L.marker([lat, lng]).addTo(map);
+    marker.bindPopup('<strong>Our Restaurant</strong><br>123 Restaurant Street').openPopup();
+}
+
+// Handle reservation form submission
+function handleReservation(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const reservationData = Object.fromEntries(formData.entries());
+    
+    // Simple validation
+    if (!isValidPhoneNumber(reservationData.phone)) {
+        alert('Please enter a valid phone number');
+        return;
+    }
+
+    if (!isValidDate(reservationData.date)) {
+        alert('Please select a valid date');
+        return;
+    }
+
+    // Here you would typically send the data to your server
+    console.log('Reservation data:', reservationData);
+    
+    // For demo purposes, show success message
+    alert('Reservation submitted successfully! We will confirm your reservation shortly.');
+    e.target.reset();
+}
+
+// Validation helpers
+function isValidPhoneNumber(phone) {
+    const phoneRegex = /^\+?[\d\s-()]{10,}$/;
+    return phoneRegex.test(phone);
+}
+
+function isValidDate(date) {
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selectedDate >= today;
+}
