@@ -60,16 +60,16 @@ function displayMenuItems() {
 
 function createMenuItemElement(item) {
     const menuItem = document.createElement('div');
-    menuItem.className = 'menu-item';
+    menuItem.className = 'restaurant-menu-item';
     menuItem.innerHTML = `
-        <div class="menu-item-image">
-            <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1760&q=80'}" alt="${item.name}">
+        <div class="restaurant-menu-item-image">
+            <img src="${item.image || 'placeholder.jpg'}" alt="${item.name}">
         </div>
-        <div class="menu-item-content">
+        <div class="restaurant-menu-item-content">
             <h3>${item.name}</h3>
             <p>${item.description}</p>
-            <div class="menu-item-footer">
-                <span class="price">$${item.price.toFixed(2)}</span>
+            <div class="restaurant-menu-item-footer">
+                <span class="restaurant-menu-item-price">$${item.price.toFixed(2)}</span>
             </div>
         </div>
     `;

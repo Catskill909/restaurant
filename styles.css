@@ -171,6 +171,120 @@ h1, h2, h3, h4 {
     line-height: 1.8;
 }
 
+/* Restaurant Menu Section - Completely separate from navigation */
+.restaurant-menu-section {
+    padding: var(--section-spacing) 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.restaurant-menu-section > h2 {
+    text-align: center;
+    font-size: 1.75rem;
+    margin-bottom: 3rem;
+    color: var(--text);
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.restaurant-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.restaurant-menu-item {
+    background: var(--card-bg);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    animation: slideIn 0.6s ease-out forwards;
+}
+
+.restaurant-menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.restaurant-menu-item-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.restaurant-menu-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.restaurant-menu-item:hover .restaurant-menu-item-image img {
+    transform: scale(1.05);
+}
+
+.restaurant-menu-item-content {
+    padding: 1.5rem;
+}
+
+.restaurant-menu-item h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.restaurant-menu-item p {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.restaurant-menu-item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.restaurant-menu-item-price {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Add animation delays for staggered effect */
+.restaurant-menu-item:nth-child(2) { animation-delay: 0.2s; }
+.restaurant-menu-item:nth-child(3) { animation-delay: 0.4s; }
+.restaurant-menu-item:nth-child(4) { animation-delay: 0.6s; }
+
 /* Menu Section */
 .menu-section {
     padding: var(--section-spacing) 1rem;
