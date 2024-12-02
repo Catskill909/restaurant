@@ -88,23 +88,23 @@ h1, h2, h3, h4 {
 .nav-links li:nth-child(4) { animation-delay: 0.4s; }
 .nav-links li:nth-child(5) { animation-delay: 0.5s; }
 
-.nav-links a {
+.nav-links li a {
     color: var(--text);
     text-decoration: none;
     font-weight: 400;
     font-size: 1.1rem;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    transition: var(--transition);
+    transition: color 0.3s ease;
     position: relative;
     padding: 0.5rem 0;
 }
 
-.nav-links a:hover {
+.nav-links li a:hover {
     color: var(--accent);
 }
 
-.nav-links a:after {
+.nav-links li a:after {
     content: '';
     position: absolute;
     width: 0;
@@ -112,11 +112,11 @@ h1, h2, h3, h4 {
     bottom: 0;
     left: 50%;
     background-color: var(--accent);
-    transition: all 0.3s ease;
+    transition: width 0.3s ease;
     transform: translateX(-50%);
 }
 
-.nav-links a:hover:after {
+.nav-links li a:hover:after {
     width: 100%;
 }
 
