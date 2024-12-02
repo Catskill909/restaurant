@@ -58,24 +58,50 @@ h1, h2, h3, h4 {
 
 .nav-brand {
     font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--accent);
+    letter-spacing: 1px;
+    transition: var(--transition);
 }
 
+.nav-brand:hover {
+    color: var(--text);
+    text-shadow: 2px 2px 4px rgba(228, 179, 99, 0.2);
+}
+
+/* Navigation Links */
 .nav-links {
     display: flex;
-    gap: 2rem;
+    gap: 2.5rem;
     list-style: none;
 }
+
+.nav-links li {
+    opacity: 0;
+    animation: fadeInDown 0.5s ease forwards;
+}
+
+.nav-links li:nth-child(1) { animation-delay: 0.1s; }
+.nav-links li:nth-child(2) { animation-delay: 0.2s; }
+.nav-links li:nth-child(3) { animation-delay: 0.3s; }
+.nav-links li:nth-child(4) { animation-delay: 0.4s; }
+.nav-links li:nth-child(5) { animation-delay: 0.5s; }
 
 .nav-links a {
     color: var(--text);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 400;
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     transition: var(--transition);
     position: relative;
     padding: 0.5rem 0;
+}
+
+.nav-links a:hover {
+    color: var(--accent);
 }
 
 .nav-links a:after {
@@ -84,13 +110,25 @@ h1, h2, h3, h4 {
     width: 0;
     height: 2px;
     bottom: 0;
-    left: 0;
+    left: 50%;
     background-color: var(--accent);
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
 }
 
 .nav-links a:hover:after {
     width: 100%;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Hero Section */
@@ -111,18 +149,48 @@ h1, h2, h3, h4 {
 
 .hero-content {
     max-width: 800px;
+    opacity: 0;
+    animation: fadeIn 1.2s ease-out forwards;
 }
 
 .hero-content h1 {
     font-size: 4rem;
     margin-bottom: 1.5rem;
     line-height: 1.2;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1.2s ease-out forwards;
+    animation-delay: 0.3s;
 }
 
 .hero-content p {
     font-size: 1.5rem;
     color: var(--text-muted);
     margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1.2s ease-out forwards;
+    animation-delay: 0.6s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* About Section */
@@ -725,16 +793,6 @@ h1, h2, h3, h4 {
     from {
         opacity: 0;
         transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.menu-item {
-    animation: fadeIn 0.6s ease-out forwards;
-}
     }
     to {
         opacity: 1;
