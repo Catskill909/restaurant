@@ -2,6 +2,26 @@
 
 A modern, responsive restaurant website with an integrated Content Management System (CMS) that allows for easy menu management and future customization capabilities.
 
+## Important Implementation Notes
+
+### Menu System Clarification
+There are two distinct "menu" systems in this project:
+
+1. **Navigation Menu** (`index.html`)
+   - Located at the top of the page
+   - Contains links to page sections (Home, About, Menu, Reservation, Location)
+   - Styled with navigation-specific classes (`.main-nav`, `.nav-links`)
+   - Part of the core website structure
+
+2. **Restaurant Menu** (managed via `admin.html`)
+   - Displays food and drink items
+   - Managed through the admin CMS
+   - Organized by categories (Appetizers, Main Course, etc.)
+   - Uses restaurant-menu-specific classes (`.restaurant-menu-section`, `.restaurant-menu-item`)
+   - Data stored in localStorage
+
+This distinction is important for development as these are separate systems with different purposes and styling needs.
+
 ## Current Features
 
 ### Front-End
