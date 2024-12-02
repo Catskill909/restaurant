@@ -218,6 +218,31 @@ function closeModal() {
 // Event Listeners
 cancelEditBtn.addEventListener('click', resetForm);
 
+// Add Category Button - Open Modal
+addCategoryBtn.addEventListener('click', () => {
+    categoryModal.classList.add('active');
+    document.getElementById('category-name').value = '';
+});
+
+// Category Form Submission
+categoryForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const categoryName = document.getElementById('category-name').value.trim();
+    
+    if (categoryName && !categories.includes(categoryName)) {
+        categories.push(categoryName);
+        localStorage.setItem('categories', JSON.stringify(categories));
+        populateCategorySelect();
+        displayCategories();
+        showToast('Category added successfully!', 'success');
+        closeModal();
+    } else if (categories.includes(categoryName)) {
+        showToast('Category already exists!', 'warning');
+    }
+    
+    document.getElementById('category-name').value = '';
+});
+
 // Close modal when clicking outside
 categoryModal.addEventListener('click', (e) => {
     if (e.target === categoryModal) {
