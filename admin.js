@@ -101,17 +101,19 @@ function displayMenuItems() {
                                 <img src="${item.image}" alt="${item.name}" loading="lazy">
                             </div>
                             <div class="menu-item-content">
-                                <h4>${item.name}</h4>
-                                <p class="description">${item.description}</p>
-                                <p class="price">$${item.price.toFixed(2)}</p>
-                            </div>
-                            <div class="item-actions">
-                                <button onclick="editMenuItem('${item.id}')" class="action-btn edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteMenuItem('${item.id}')" class="action-btn delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div class="menu-item-info">
+                                    <div class="menu-item-name">${item.name}</div>
+                                    <div class="menu-item-description">${item.description}</div>
+                                </div>
+                                <div class="menu-item-price">$${item.price.toFixed(2)}</div>
+                                <div class="menu-item-actions">
+                                    <button onclick="editMenuItem('${item.id}')" class="edit-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteMenuItem('${item.id}')" class="delete-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     `).join('')}
