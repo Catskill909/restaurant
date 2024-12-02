@@ -6,7 +6,7 @@ A modern, responsive restaurant website with an integrated Content Management Sy
 
 ### Front-End
 - Modern, animated landing page with sections for:
-  - Hero banner with welcome message
+  - Hero banner with parallax scrolling effect and welcome message
   - About section
   - Menu display
   - Reservation form
@@ -30,6 +30,10 @@ A modern, responsive restaurant website with an integrated Content Management Sy
 
 ## Technical Implementation
 - Pure HTML, CSS, and JavaScript
+- CSS features:
+  - Flexbox for layouts
+  - CSS parallax scrolling effect
+  - Responsive design
 - No framework dependencies
 - Local storage for data persistence
 - GSAP for animations
