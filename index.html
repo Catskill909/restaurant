@@ -39,11 +39,35 @@
 
     <!-- About Section -->
     <section id="about" class="about-section">
-        <h2>About Us</h2>
-        <div class="about-content">
-            <div class="about-text">
-                <p>Welcome to our restaurant where culinary excellence meets warm hospitality. Our passionate team of chefs creates memorable dining experiences using the finest ingredients and innovative cooking techniques.</p>
-                <p>Established in 2024, we've been serving our community with love and dedication, making every meal special for our guests.</p>
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <div class="section-header">
+                        <h2>Our Story</h2>
+                        <div class="accent-line"></div>
+                    </div>
+                    <div class="about-text reveal-content">
+                        <p class="lead">Welcome to our restaurant where culinary excellence meets warm hospitality.</p>
+                        <p>Our passionate team of chefs creates memorable dining experiences using the finest ingredients and innovative cooking techniques. Established in 2024, we've been serving our community with love and dedication, making every meal special for our guests.</p>
+                        <div class="about-features">
+                            <div class="feature reveal-stagger">
+                                <span class="feature-title">Fine Dining</span>
+                                <div class="feature-line"></div>
+                            </div>
+                            <div class="feature reveal-stagger">
+                                <span class="feature-title">Premium Wines</span>
+                                <div class="feature-line"></div>
+                            </div>
+                            <div class="feature reveal-stagger">
+                                <span class="feature-title">Expert Chefs</span>
+                                <div class="feature-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80" alt="Our Restaurant Interior">
+                </div>
             </div>
         </div>
     </section>
@@ -57,78 +81,80 @@
             </div>
         </div>
     </section>
-<!-- Reservation Section -->
-<section id="reservation" class="reservation-section">
-    <div class="container">
-        <h2>Make a Reservation</h2>
-        <div class="reservation-grid">
-            <div class="restaurant-info">
-                <div class="hours-box">
-                    <h3>Dining Hours</h3>
-                    <ul class="hours-list">
-                        <li><span>Monday - Thursday:</span> 11:30 AM - 10:00 PM</li>
-                        <li><span>Friday - Saturday:</span> 11:30 AM - 11:00 PM</li>
-                        <li><span>Sunday:</span> 11:30 AM - 9:00 PM</li>
-                    </ul>
+
+    <!-- Reservation Section -->
+    <section id="reservation" class="reservation-section">
+        <div class="container">
+            <h2>Make a Reservation</h2>
+            <div class="reservation-grid">
+                <div class="restaurant-info">
+                    <div class="hours-box">
+                        <h3>Dining Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Thursday:</span> 11:30 AM - 10:00 PM</li>
+                            <li><span>Friday - Saturday:</span> 11:30 AM - 11:00 PM</li>
+                            <li><span>Sunday:</span> 11:30 AM - 9:00 PM</li>
+                        </ul>
+                    </div>
+                    <div class="contact-box">
+                        <h3>Contact</h3>
+                        <p><i class="fas fa-phone"></i> (555) 123-4567</p>
+                        <p><i class="fas fa-envelope"></i> reservations@restaurant.com</p>
+                    </div>
                 </div>
-                <div class="contact-box">
-                    <h3>Contact</h3>
-                    <p><i class="fas fa-phone"></i> (555) 123-4567</p>
-                    <p><i class="fas fa-envelope"></i> reservations@restaurant.com</p>
-                </div>
-            </div>
-            <div class="reservation-form">
-                <form id="reservationForm">
-                    <div class="form-group">
-                        <input type="text" id="name" name="name" required placeholder=" ">
-                        <label for="name">Full Name</label>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" id="email" name="email" required placeholder=" ">
-                        <label for="email">Email</label>
-                    </div>
-                    <div class="form-group">
-                        <input type="tel" id="phone" name="phone" required placeholder=" ">
-                        <label for="phone">Phone Number</label>
-                    </div>
-                    <div class="form-row">
+                <div class="reservation-form">
+                    <form id="reservationForm">
                         <div class="form-group">
-                            <input type="number" id="guests" name="guests" min="1" max="20" required placeholder=" ">
-                            <label for="guests">Number of Guests</label>
+                            <input type="text" id="name" name="name" required placeholder=" ">
+                            <label for="name">Full Name</label>
                         </div>
                         <div class="form-group">
-                            <input type="date" id="date" name="date" required placeholder=" ">
-                            <label for="date">Date</label>
+                            <input type="email" id="email" name="email" required placeholder=" ">
+                            <label for="email">Email</label>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <select id="time" name="time" required>
-                            <option value="">Select Time</option>
-                            <option value="11:30">11:30 AM</option>
-                            <option value="12:00">12:00 PM</option>
-                            <option value="12:30">12:30 PM</option>
-                            <option value="13:00">1:00 PM</option>
-                            <option value="13:30">1:30 PM</option>
-                            <option value="14:00">2:00 PM</option>
-                            <option value="18:00">6:00 PM</option>
-                            <option value="18:30">6:30 PM</option>
-                            <option value="19:00">7:00 PM</option>
-                            <option value="19:30">7:30 PM</option>
-                            <option value="20:00">8:00 PM</option>
-                            <option value="20:30">8:30 PM</option>
-                        </select>
-                        <label for="time">Preferred Time</label>
-                    </div>
-                    <div class="form-group">
-                        <textarea id="requests" name="requests" rows="3" placeholder=" "></textarea>
-                        <label for="requests">Special Requests (Optional)</label>
-                    </div>
-                    <button type="submit" class="btn-reserve">Make Reservation</button>
-                </form>
+                        <div class="form-group">
+                            <input type="tel" id="phone" name="phone" required placeholder=" ">
+                            <label for="phone">Phone Number</label>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="number" id="guests" name="guests" min="1" max="20" required placeholder=" ">
+                                <label for="guests">Number of Guests</label>
+                            </div>
+                            <div class="form-group">
+                                <input type="date" id="date" name="date" required placeholder=" ">
+                                <label for="date">Date</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <select id="time" name="time" required>
+                                <option value="">Select Time</option>
+                                <option value="11:30">11:30 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="12:30">12:30 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="13:30">1:30 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="18:00">6:00 PM</option>
+                                <option value="18:30">6:30 PM</option>
+                                <option value="19:00">7:00 PM</option>
+                                <option value="19:30">7:30 PM</option>
+                                <option value="20:00">8:00 PM</option>
+                                <option value="20:30">8:30 PM</option>
+                            </select>
+                            <label for="time">Preferred Time</label>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="requests" name="requests" rows="3" placeholder=" "></textarea>
+                            <label for="requests">Special Requests (Optional)</label>
+                        </div>
+                        <button type="submit" class="btn-reserve">Make Reservation</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+
     <!-- Location Section -->
     <section id="location" class="location-section">
         <div class="container">

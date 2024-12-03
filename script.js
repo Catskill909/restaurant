@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     displayMenuItems();
     initMap();
     initNavigation();
+    initScrollReveal();
     
     // Listen for changes in localStorage
     window.addEventListener('storage', (e) => {
@@ -95,6 +96,33 @@ document.addEventListener('DOMContentLoaded', () => {
         reservationForm.addEventListener('submit', handleReservation);
     }
 });
+
+function initScrollReveal() {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -25% 0px', // Trigger when element is 25% into viewport
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            } else {
+                // Reset animation when element is out of view
+                if (entry.target.classList.contains('reset-on-scroll')) {
+                    entry.target.classList.remove('active');
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Observe reveal elements
+    document.querySelectorAll('.reveal-content, .reveal-stagger, .about-image').forEach(el => {
+        el.classList.add('reset-on-scroll'); // Add class to enable animation reset
+        observer.observe(el);
+    });
+}
 
 // Initialize navigation functionality
 function initNavigation() {
