@@ -36,6 +36,11 @@ This distinction is important for development as these are separate systems with
   - Smooth scroll behavior to sections
   - Performance-optimized scroll animations
   - Clean underline effects
+  - Mobile-responsive design with:
+    - Hamburger menu toggle
+    - Dark overlay background
+    - Smooth open/close animations
+    - Close on link click, outside click, or escape key
 - Hero section with:
   - Full-screen background image
   - Overlay with gradient effect
@@ -43,7 +48,7 @@ This distinction is important for development as these are separate systems with
 - Dynamic menu display organized by categories
 - Interactive map integration
 - Modern reservation form with floating labels
-- Responsive design (desktop only, mobile in progress)
+- Responsive design (mobile-ready with hamburger menu)
 
 ### Admin CMS
 - Full menu management system:
