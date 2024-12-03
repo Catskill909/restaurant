@@ -80,6 +80,7 @@ function createMenuItemElement(item) {
 document.addEventListener('DOMContentLoaded', () => {
     displayMenuItems();
     initMap();
+    initNavigation();
     
     // Listen for changes in localStorage
     window.addEventListener('storage', (e) => {
@@ -94,6 +95,70 @@ document.addEventListener('DOMContentLoaded', () => {
         reservationForm.addEventListener('submit', handleReservation);
     }
 });
+
+// Initialize navigation functionality
+function initNavigation() {
+    const nav = document.querySelector('.main-nav');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    
+    // Update active section on scroll
+    function updateActiveSection() {
+        const sections = document.querySelectorAll('section');
+        const scrollPosition = window.scrollY + 100;
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            const sectionId = section.getAttribute('id');
+            
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${sectionId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        // Add scrolled class when page is scrolled
+        if (window.scrollY > 50) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    }
+
+    // Add smooth scroll behavior to navigation links
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Add scroll event listener with throttling for better performance
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updateActiveSection();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+
+    // Initial call to set active section
+    updateActiveSection();
+}
 
 // Initialize the map
 function initMap() {

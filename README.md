@@ -30,21 +30,20 @@ This distinction is important for development as these are separate systems with
 ### Front-End
 - Modern, animated navigation with:
   - Bold Oswald font typography
-  - Smooth hover animations
-  - Active state indicators
-  - Scroll-based background changes
+  - Smooth hover animations with progressive underlines
+  - Active state indicators that highlight current section
+  - Scroll-based background changes with blur effect
+  - Smooth scroll behavior to sections
+  - Performance-optimized scroll animations
   - Clean underline effects
+- Hero section with:
+  - Full-screen background image
+  - Overlay with gradient effect
+  - Animated headline and subheading
 - Dynamic menu display organized by categories
 - Interactive map integration
 - Modern reservation form with floating labels
-- Modern, animated landing page with sections for:
-  - Hero banner with welcome message
-  - About section
-  - Menu display
-  - Reservation form
-  - Location map
-- Responsive design that works on all devices
-- GSAP animations for enhanced user experience
+- Responsive design (desktop only, mobile in progress)
 
 ### Admin CMS
 - Full menu management system:
