@@ -100,6 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function initNavigation() {
     const nav = document.querySelector('.main-nav');
     const navLinks = document.querySelectorAll('.nav-links a');
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.querySelector('.mobile-menu');
     
     // Update active section on scroll
     function updateActiveSection() {
@@ -143,6 +145,34 @@ function initNavigation() {
             }
         });
     });
+
+    // Mobile menu toggle
+    if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                mobileMenu.classList.remove('active');
+            }
+        });
+    }
 
     // Add scroll event listener with throttling for better performance
     let ticking = false;
