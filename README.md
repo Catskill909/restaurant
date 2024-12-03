@@ -9,8 +9,11 @@ There are two distinct "menu" systems in this project:
 
 1. **Navigation Menu** (`index.html`)
    - Located at the top of the page
+   - Modern design with Oswald font
+   - Smooth hover animations and active states
+   - Responsive scroll-based background changes
+   - Clean, minimalist styling with accent underlines
    - Contains links to page sections (Home, About, Menu, Reservation, Location)
-   - Styled with navigation-specific classes (`.main-nav`, `.nav-links`)
    - Part of the core website structure
 
 2. **Restaurant Menu** (managed via `admin.html`)
@@ -25,6 +28,15 @@ This distinction is important for development as these are separate systems with
 ## Current Features
 
 ### Front-End
+- Modern, animated navigation with:
+  - Bold Oswald font typography
+  - Smooth hover animations
+  - Active state indicators
+  - Scroll-based background changes
+  - Clean underline effects
+- Dynamic menu display organized by categories
+- Interactive map integration
+- Modern reservation form with floating labels
 - Modern, animated landing page with sections for:
   - Hero banner with welcome message
   - About section
@@ -32,10 +44,7 @@ This distinction is important for development as these are separate systems with
   - Reservation form
   - Location map
 - Responsive design that works on all devices
-- Dynamic menu display organized by categories
 - GSAP animations for enhanced user experience
-- Interactive map integration
-- Modern reservation form with floating labels
 
 ### Admin CMS
 - Full menu management system:
