@@ -25,6 +25,15 @@ There are two distinct "menu" systems in this project:
 
 This distinction is important for development as these are separate systems with different purposes and styling needs.
 
+## Recent Updates
+
+### About Section Enhancement
+- Implemented elegant two-column layout with text and image
+- Added smooth scroll-triggered animations
+- Created staggered reveal effects for features
+- Enhanced typography with Oswald and Playfair Display fonts
+- Optimized animation timing for better user experience
+
 ## Current Features
 
 ### Front-End
@@ -49,6 +58,12 @@ This distinction is important for development as these are separate systems with
 - Interactive map integration
 - Modern reservation form with floating labels
 - Responsive design (mobile-ready with hamburger menu)
+- About Section
+  - Modern two-column grid layout
+  - Scroll-triggered animations
+  - Elegant feature titles with hover effects
+  - Responsive design
+  - Optimized image loading
 
 ### Admin CMS
 - Full menu management system:
