@@ -58,10 +58,12 @@ This distinction is important for development as these are separate systems with
 - Interactive map integration
 - Modern reservation form with floating labels
 - Responsive design (mobile-ready with hamburger menu)
-- About Section
+- Elegant About section with:
   - Modern two-column grid layout
   - Scroll-triggered animations
-  - Elegant feature titles with hover effects
+  - Staggered feature reveals
+  - Enhanced typography with Oswald font
+  - Hover effects on feature titles
   - Responsive design
   - Optimized image loading
 
