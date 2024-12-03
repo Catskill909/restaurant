@@ -67,6 +67,14 @@ This distinction is important for development as these are separate systems with
   - Responsive design
   - Optimized image loading
 
+### Menu Section
+- Responsive grid layout for menu categories and items
+- Desktop: 2 category columns with 2 items per row
+- Mobile: Single category column with 2 items per row
+- Dynamic menu item loading from localStorage
+- Hover effects and smooth transitions
+- Optimized spacing and typography
+
 ### Admin CMS
 - Full menu management system:
   - Add new menu items with name, description, price, and image

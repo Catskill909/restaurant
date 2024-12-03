@@ -423,120 +423,85 @@ h1, h2, h3, h4 {
 /* Menu Section */
 .menu-section {
     padding: var(--section-spacing) 0;
-    background: var(--dark-bg);
-    position: relative;
-}
-
-.menu-section > h2 {
-    text-align: center;
-    font-size: 1.75rem;
-    margin-bottom: 3rem;
-    color: var(--text);
-    font-weight: 300;
-    letter-spacing: 3px;
-    text-transform: uppercase;
+    background-color: var(--dark-bg);
 }
 
 .menu-categories-wrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 1.5rem;
+    margin-top: 2rem;
 }
 
 .menu-category {
-    margin-bottom: 2.5rem;
+    background: var(--card-bg);
+    border-radius: var(--card-radius);
+    padding: 1.25rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .category-title {
-    font-size: 1.25rem;
     color: var(--accent);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(228, 179, 99, 0.3);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 400;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
 .menu-items {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    justify-content: flex-start;
 }
 
 .menu-item {
-    flex: 0 1 calc(50% - 0.5rem);
-    min-width: 200px;
-    background: var(--card-bg);
+    background: var(--darker-bg);
     border-radius: var(--card-radius);
     overflow: hidden;
     transition: var(--transition);
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
 
 .menu-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .menu-item-image {
-    width: 100%;
-    height: 130px;
-    overflow: hidden;
     position: relative;
-}
-
-.menu-item-image::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40%;
-    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+    padding-top: 60%; /* Slightly shorter aspect ratio */
+    overflow: hidden;
 }
 
 .menu-item-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: var(--card-radius);
     transition: var(--transition);
 }
 
-.menu-item:hover .menu-item-image img {
-    transform: scale(1.05);
-}
-
 .menu-item-content {
-    padding: 0.75rem;
+    padding: 1rem;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
 .menu-item h3 {
-    font-size: 0.95rem;
-    margin-bottom: 0.35rem;
-    color: var(--text);
-    line-height: 1.3;
-    font-weight: 500;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
 }
 
 .menu-item p {
-    color: var(--text-subtle);
-    margin-bottom: 0.5rem;
-    font-size: 0.8rem;
-    line-height: 1.4;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
     flex-grow: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 .menu-item-footer {
@@ -544,30 +509,11 @@ h1, h2, h3, h4 {
     justify-content: space-between;
     align-items: center;
     margin-top: auto;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.menu-item-category {
-    font-size: 0.7rem;
-    color: var(--text-subtle);
-    background: rgba(228, 179, 99, 0.1);
-    padding: 0.15rem 0.4rem;
-    border-radius: 12px;
-    letter-spacing: 0.5px;
-}
-
-.menu-item .price {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--accent);
-}
-
-/* Mobile menu adjustments */
-@media screen and (max-width: 767px) {
-    .menu-items {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+@media (max-width: 768px) {
+    .menu-categories-wrapper {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -833,7 +779,7 @@ h1, h2, h3, h4 {
 
     .menu-categories-wrapper {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.5rem;
     }
 
     /* Reservation Section */
