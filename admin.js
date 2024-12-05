@@ -191,6 +191,66 @@ function deleteCategory(category) {
     }
 }
 
+// Add Category Button
+addCategoryBtn.addEventListener('click', () => {
+    categoryModal.classList.add('active');
+});
+
+// Category Form Submission
+categoryForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const categoryName = document.getElementById('category-name').value.trim();
+    
+    if (!categoryName) {
+        showToast('Please enter a category name', 'warning');
+        return;
+    }
+    
+    if (categories.includes(categoryName)) {
+        showToast('Category already exists!', 'warning');
+        return;
+    }
+
+    // Add the category to both state and localStorage
+    categories = [...categories, categoryName];
+    localStorage.setItem('categories', JSON.stringify(categories));
+    
+    // Update UI elements
+    populateCategorySelect();
+    displayMenuItems();
+    
+    // Show success message in modal
+    const modalContent = document.querySelector('.modal-content');
+    modalContent.innerHTML = `
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <h4>Category Added!</h4>
+            <p>The category "${categoryName}" has been added successfully.</p>
+            <button onclick="closeModal()" class="btn primary">Done</button>
+        </div>
+    `;
+
+    // Auto close after 2 seconds
+    setTimeout(() => {
+        closeModal();
+        // Reset the modal content after it's closed
+        setTimeout(() => {
+            modalContent.innerHTML = `
+                <h3>Add Category</h3>
+                <form id="category-form">
+                    <div class="form-group">
+                        <label for="category-name">Category Name</label>
+                        <input type="text" id="category-name" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn primary">Add Category</button>
+                </form>
+            `;
+            // Reattach event listener to the new form
+            document.getElementById('category-form').addEventListener('submit', categoryForm.onsubmit);
+        }, 300);
+    }, 2000);
+});
+
 // Utility Functions
 function resetForm() {
     editingId = null;
