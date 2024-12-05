@@ -86,33 +86,44 @@ function displayMenuItems() {
         return acc;
     }, {});
     
+    // Sort categories alphabetically
+    const sortedCategories = Object.keys(itemsByCategory).sort();
+    
     // Create category sections
-    Object.entries(itemsByCategory).forEach(([category, items]) => {
+    sortedCategories.forEach(category => {
+        const items = itemsByCategory[category];
         if (items.length > 0) {
             const section = document.createElement('div');
             section.className = 'menu-category';
             
             section.innerHTML = `
-                <h3>${category} (${items.length})</h3>
+                <h3>${category} <span class="category-count">(${items.length})</span></h3>
                 <div class="menu-items">
                     ${items.map(item => `
-                        <div class="menu-item">
+                        <div class="menu-item" data-category="${item.category}">
                             <div class="menu-item-image">
-                                <img src="${item.image}" alt="${item.name}" loading="lazy">
+                                <img 
+                                    src="${item.image || 'placeholder.jpg'}" 
+                                    alt="${item.name}"
+                                    loading="lazy"
+                                    onerror="this.src='placeholder.jpg'; this.classList.add('placeholder');"
+                                >
                             </div>
                             <div class="menu-item-content">
                                 <div class="menu-item-info">
-                                    <div class="menu-item-name">${item.name}</div>
-                                    <div class="menu-item-description">${item.description}</div>
+                                    <div class="menu-item-name" title="${item.name}">${item.name}</div>
+                                    <div class="menu-item-description" title="${item.description}">${item.description}</div>
                                 </div>
-                                <div class="menu-item-price">$${item.price.toFixed(2)}</div>
-                                <div class="menu-item-actions">
-                                    <button onclick="editMenuItem('${item.id}')" class="edit-btn">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteMenuItem('${item.id}')" class="delete-btn">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                <div class="menu-item-footer">
+                                    <div class="menu-item-price">$${item.price.toFixed(2)}</div>
+                                    <div class="menu-item-actions">
+                                        <button onclick="editMenuItem('${item.id}')" class="edit-btn" title="Edit item">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteMenuItem('${item.id}')" class="delete-btn" title="Delete item">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -123,6 +134,17 @@ function displayMenuItems() {
             menuCategories.appendChild(section);
         }
     });
+    
+    // Show empty state if no items
+    if (menuItems.length === 0) {
+        menuCategories.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-utensils"></i>
+                <h3>No menu items yet</h3>
+                <p>Start by adding your first menu item using the form on the left.</p>
+            </div>
+        `;
+    }
 }
 
 function displayCategories() {
