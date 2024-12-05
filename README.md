@@ -1,147 +1,98 @@
-# Restaurant CMS Template
+# Restaurant Website
 
-A modern, responsive restaurant website with an integrated Content Management System (CMS) that allows for easy menu management and future customization capabilities.
+A modern, responsive restaurant website with menu management capabilities.
 
-## Important Implementation Notes
+## Features
 
-### Menu System Clarification
-There are two distinct "menu" systems in this project:
+### Customer View
+- Clean, modern interface
+- Responsive design for all devices
+- Dynamic menu display with categories
+- Smooth animations and transitions
+- Real-time menu updates
 
-1. **Navigation Menu** (`index.html`)
-   - Located at the top of the page
-   - Modern design with Oswald font
-   - Smooth hover animations and active states
-   - Responsive scroll-based background changes
-   - Clean, minimalist styling with accent underlines
-   - Contains links to page sections (Home, About, Menu, Reservation, Location)
-   - Part of the core website structure
+### Admin Panel
+- Menu item management (Add/Edit/Delete)
+- Category management with enhanced UX
+  - Animated success confirmations
+  - Clear visual feedback
+  - Real-time updates
+- Image upload with preview
+- User-friendly interface
+- Toast notifications
 
-2. **Restaurant Menu** (managed via `admin.html`)
-   - Displays food and drink items
-   - Managed through the admin CMS
-   - Organized by categories (Appetizers, Main Course, etc.)
-   - Uses restaurant-menu-specific classes (`.restaurant-menu-section`, `.restaurant-menu-item`)
-   - Data stored in localStorage
+## Technical Details
 
-This distinction is important for development as these are separate systems with different purposes and styling needs.
+### Built With
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- localStorage for data persistence
 
-## Recent Updates
+### Key Components
+1. **Menu Management**
+   - Dynamic category system
+   - CRUD operations for menu items
+   - Real-time updates
 
-### About Section Enhancement
-- Implemented elegant two-column layout with text and image
-- Added smooth scroll-triggered animations
-- Created staggered reveal effects for features
-- Enhanced typography with Oswald and Playfair Display fonts
-- Optimized animation timing for better user experience
+2. **User Interface**
+   - Responsive design
+   - Modern animations
+   - Intuitive navigation
 
-## Current Features
-
-### Front-End
-- Modern, animated navigation with:
-  - Bold Oswald font typography
-  - Smooth hover animations with progressive underlines
-  - Active state indicators that highlight current section
-  - Scroll-based background changes with blur effect
-  - Smooth scroll behavior to sections
-  - Performance-optimized scroll animations
-  - Clean underline effects
-  - Mobile-responsive design with:
-    - Hamburger menu toggle
-    - Dark overlay background
-    - Smooth open/close animations
-    - Close on link click, outside click, or escape key
-- Hero section with:
-  - Full-screen background image
-  - Overlay with gradient effect
-  - Animated headline and subheading
-- Dynamic menu display organized by categories
-- Interactive map integration
-- Modern reservation form with floating labels
-- Responsive design (mobile-ready with hamburger menu)
-- Elegant About section with:
-  - Modern two-column grid layout
-  - Scroll-triggered animations
-  - Staggered feature reveals
-  - Enhanced typography with Oswald font
-  - Hover effects on feature titles
-  - Responsive design
-  - Optimized image loading
-
-### Menu Section
-- Responsive grid layout for menu categories and items
-- Desktop: 2 category columns with 2 items per row
-- Mobile: Single category column with 2 items per row
-- Dynamic menu item loading from localStorage
-- Hover effects and smooth transitions
-- Optimized spacing and typography
-
-### Admin CMS
-- Full menu management system:
-  - Add new menu items with name, description, price, and image
-  - Edit existing menu items
-  - Delete menu items
-  - Items organized by categories
-- Real-time preview of changes
-- Image URL support for menu items
-- Local storage persistence for menu data
-- User-friendly interface with form validation
-
-## Technical Implementation
-- Pure HTML, CSS, and JavaScript
-- No framework dependencies
-- Local storage for data persistence
-- GSAP for animations
-- Leaflet.js for map functionality
-- Font Awesome for icons
-- Google Fonts integration
-
-## Current Structure
-- `index.html` - Main customer-facing website
-- `admin.html` - Admin CMS interface
-- `styles.css` - Shared styles
-- `admin.js` - CMS functionality
-- `script.js` - Front-end functionality
-
-## Future Goals
-
-### Short-term Improvements
-- Enhanced menu item styling in the front-end display
-- Better image handling and optimization
-- Improved form feedback and validation
-- More interactive elements in the front-end
-
-### Long-term Goals
-Make most front-end elements customizable through the CMS, including:
-- Restaurant name and branding
-- Color schemes and styling
-- Header content and navigation
-- Section content (About, Contact, Hours)
-- Social media links
-- Map location
-- Reservation settings
-
-### Core Elements to Remain Fixed
-- Basic page structure and sections
-- Menu management functionality
-- Front-end and CMS core features
-- Data persistence system
-- Overall layout and responsive design
+3. **Admin Features**
+   - Secure admin panel
+   - Image handling
+   - Form validation
+   - Visual feedback system
 
 ## Getting Started
 
-1. Clone this repository
-2. Open `index.html` in your browser to view the customer-facing website
-3. Open `admin.html` to access the admin CMS
-4. Use the CMS to manage your menu items
-5. Changes will persist in local storage
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/restaurant.git
+   ```
 
-## Browser Compatibility
-- Tested on modern browsers (Chrome, Firefox, Safari)
-- Requires JavaScript enabled
-- Local storage support required
+2. Open index.html in your browser to view the customer interface
+3. Navigate to admin.html for the management interface
 
-## Notes
-- Currently using local storage for data persistence
-- Images are referenced via URLs
-- No server-side implementation required
-- Designed for single-restaurant use
+## Usage
+
+### Customer Interface
+- Browse menu items by category
+- View item details and prices
+- Responsive layout adapts to your device
+
+### Admin Interface
+1. Access admin panel through admin.html
+2. Add/Edit menu items:
+   - Fill in item details
+   - Upload images
+   - Select category
+3. Manage categories:
+   - Add new categories
+   - View success confirmations
+   - See real-time updates
+
+## Development
+
+### Current Status
+- Core features implemented
+- Enhanced UX for category management
+- Responsive design complete
+
+### Roadmap
+1. Authentication system
+2. Database integration
+3. Order management
+4. Online reservations
+
+## Contributing
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a pull request
+
+## License
+This project is licensed under the MIT License.
