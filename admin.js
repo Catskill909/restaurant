@@ -84,15 +84,203 @@ function validateSession() {
     return true;
 }
 
-// Check authentication status on page load
+// Modal State Management - Enhancement
+const ModalManager = {
+    activeModal: null,
+    
+    show(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            // Preserve existing modal display logic
+            if (modal.style.display === 'flex') return;
+            
+            // Close any open modal first
+            if (this.activeModal) {
+                this.close();
+            }
+            
+            this.activeModal = modal;
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+            console.log(`Modal ${modalId} shown`);
+        }
+    },
+    
+    close() {
+        if (this.activeModal) {
+            this.activeModal.classList.remove('active');
+            this.activeModal.style.display = 'none';
+            this.activeModal = null;
+        }
+    },
+    
+    init() {
+        // Preserve existing click handlers
+        const existingModals = document.querySelectorAll('.modal');
+        existingModals.forEach(modal => {
+            const originalClickHandler = modal.onclick;
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    if (originalClickHandler) originalClickHandler(e);
+                    this.close();
+                }
+            };
+        });
+    }
+};
+
+// Preserve existing initialization
+const existingDOMContentLoaded = document.body.onload;
+document.body.onload = function(e) {
+    // Call existing initialization first
+    if (existingDOMContentLoaded) existingDOMContentLoaded(e);
+    
+    // Then initialize modal manager
+    ModalManager.init();
+    
+    // Add enhanced button handlers without removing existing ones
+    document.body.addEventListener('click', (e) => {
+        const button = e.target.closest('button');
+        if (!button) return;
+        
+        // Only handle specific new buttons
+        switch (button.id) {
+            case 'site-settings-btn':
+                e.preventDefault();
+                ModalManager.show('settings-modal');
+                break;
+        }
+    });
+};
+
+// Enhance existing modal functions without replacing them
+const existingCloseModal = window.closeModal;
+window.closeModal = function() {
+    if (existingCloseModal) existingCloseModal();
+    ModalManager.close();
+};
+
+const existingOpenSettingsModal = window.openSettingsModal;
+window.openSettingsModal = function() {
+    if (existingOpenSettingsModal) existingOpenSettingsModal();
+    ModalManager.show('settings-modal');
+};
+
+const existingCloseSettingsModal = window.closeSettingsModal;
+window.closeSettingsModal = function() {
+    if (existingCloseSettingsModal) existingCloseSettingsModal();
+    ModalManager.close();
+};
+
+// Modal State Management
+const ModalManagerOriginal = {
+    activeModal: null,
+    
+    show(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            this.activeModal = modal;
+            modal.classList.add('active');
+            console.log(`Modal ${modalId} shown`);
+        }
+    },
+    
+    close() {
+        if (this.activeModal) {
+            this.activeModal.classList.remove('active');
+            this.activeModal = null;
+        }
+    },
+    
+    init() {
+        // Close on outside click using event delegation
+        document.body.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.close();
+            }
+        });
+        
+        // Add close buttons to all modals
+        document.querySelectorAll('.modal').forEach(modal => {
+            const content = modal.querySelector('.modal-content');
+            if (content && !content.querySelector('.modal-close')) {
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'modal-close';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.onclick = () => this.close();
+                content.insertBefore(closeBtn, content.firstChild);
+            }
+        });
+    }
+};
+
+// Single DOMContentLoaded handler with proper initialization order
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded - Starting initialization');
+    
+    // Check authentication first
     const isAuthenticated = validateSession();
     if (!isAuthenticated) {
         document.getElementById('loginOverlay').style.display = 'flex';
-    } else {
-        document.getElementById('loginOverlay').style.display = 'none';
+        return;
+    }
+    document.getElementById('loginOverlay').style.display = 'none';
+    
+    // Initialize modal system
+    ModalManagerOriginal.init();
+    
+    // Use event delegation for all button clicks
+    document.body.addEventListener('click', (e) => {
+        // Find closest button if clicked element is a child (like an icon)
+        const button = e.target.closest('button');
+        if (!button) return;
+        
+        switch (button.id) {
+            case 'add-category-btn':
+                e.preventDefault();
+                ModalManagerOriginal.show('category-modal');
+                break;
+                
+            case 'site-settings-btn':
+                e.preventDefault();
+                ModalManagerOriginal.show('settings-modal');
+                break;
+                
+            case 'manageCategoriesBtn':
+                e.preventDefault();
+                displayCategories();
+                ModalManagerOriginal.show('category-modal');
+                break;
+        }
+    });
+    
+    // Initialize UI components
+    try {
+        populateCategorySelect();
+        displayMenuItems();
+        displayCategories();
+        initializeDragAndDrop();
+        loadSiteSettings();
+        console.log('UI components initialized');
+    } catch (err) {
+        console.error('Error initializing UI:', err);
+        showToast('Error initializing interface', 'error');
     }
 });
+
+// Update existing functions to use ModalManager
+function closeModal() {
+    ModalManagerOriginal.close();
+}
+
+function openSettingsModal() {
+    populateSettingsForm();
+    ModalManagerOriginal.show('settings-modal');
+}
+
+function closeSettingsModal() {
+    ModalManagerOriginal.close();
+}
 
 // State Management
 let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
@@ -111,69 +299,6 @@ const cancelEditBtn = document.getElementById('cancel-edit');
 const formTitle = document.getElementById('form-title');
 const imageInput = document.getElementById('item-image');
 const imagePreview = document.getElementById('image-preview').querySelector('img');
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded');
-    
-    // Get the button directly
-    const addCategoryBtn = document.getElementById('add-category-btn');
-    const categoryModal = document.getElementById('category-modal');
-    const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
-    
-    console.log('Add Category Button:', addCategoryBtn);
-    console.log('Category Modal:', categoryModal);
-    
-    // Add Category Button
-    if (addCategoryBtn) {
-        console.log('Adding click listener to Add Category button');
-        addCategoryBtn.addEventListener('click', function() {
-            console.log('Add Category button clicked');
-            if (categoryModal) {
-                categoryModal.classList.add('active');
-                console.log('Added active class to modal');
-            } else {
-                console.error('Category modal not found');
-            }
-        });
-    } else {
-        console.error('Add Category button not found!');
-    }
-
-    // Manage Categories Button
-    if (manageCategoriesBtn) {
-        manageCategoriesBtn.addEventListener('click', () => {
-            displayCategories();
-            categoryModal.classList.add('active');
-        });
-    }
-
-    populateCategorySelect();
-    displayMenuItems();
-    displayCategories();
-    initializeDragAndDrop();
-    addDropMarkerStyle();
-
-    // Add close button
-    const modalContent = document.querySelector('.modal-content');
-    if (modalContent && !modalContent.querySelector('.modal-close')) {
-        const closeButton = document.createElement('button');
-        closeButton.className = 'modal-close';
-        closeButton.innerHTML = '&times;';
-        closeButton.onclick = closeModal;
-        modalContent.insertBefore(closeButton, modalContent.firstChild);
-    }
-
-    // Click outside to close
-    const modal = document.getElementById('category-modal');
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-    }
-});
 
 // Image Preview
 imageInput.addEventListener('change', (e) => {
@@ -347,13 +472,6 @@ function addNewCategory() {
         input.value = '';
         displayCategories();
         showToast('Category added successfully!', 'success');
-    }
-}
-
-function closeModal() {
-    const modal = document.getElementById('category-modal');
-    if (modal) {
-        modal.classList.remove('active');
     }
 }
 
@@ -859,3 +977,137 @@ categoryForm.addEventListener('submit', (e) => {
         }, 300);
     }, 2000);
 });
+
+// Site Settings Management
+const defaultSettings = {
+    restaurant: {
+        name: 'Restaurant Name',
+        tagline: 'Experience culinary excellence'
+    },
+    contact: {
+        phone: '(555) 123-4567',
+        email: 'info@restaurant.com',
+        address: '123 Main St'
+    },
+    hours: {
+        monday: { open: '11:30', close: '22:00' },
+        tuesday: { open: '11:30', close: '22:00' },
+        wednesday: { open: '11:30', close: '22:00' },
+        thursday: { open: '11:30', close: '22:00' },
+        friday: { open: '11:30', close: '23:00' },
+        saturday: { open: '11:30', close: '23:00' },
+        sunday: { open: '11:30', close: '21:00' }
+    }
+};
+
+// Load settings from localStorage
+function loadSiteSettings() {
+    return JSON.parse(localStorage.getItem('siteSettings')) || defaultSettings;
+}
+
+// Save settings to localStorage
+function saveSiteSettings(settings) {
+    localStorage.setItem('siteSettings', JSON.stringify(settings));
+    showToast('Settings saved successfully');
+    updateSiteContent();
+}
+
+// Update site content with new settings
+function updateSiteContent() {
+    const settings = loadSiteSettings();
+    document.title = settings.restaurant.name + ' - Admin Panel';
+    // Update other elements when needed
+}
+
+// Initialize hours inputs
+function initializeHours() {
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const container = document.getElementById('hours-container');
+    container.innerHTML = ''; // Clear existing content
+
+    days.forEach(day => {
+        const row = document.createElement('div');
+        row.className = 'hours-row';
+        row.innerHTML = `
+            <label>${day.charAt(0).toUpperCase() + day.slice(1)}</label>
+            <input type="time" class="form-control time-input" data-day="${day}" data-type="open" required>
+            <span>to</span>
+            <input type="time" class="form-control time-input" data-day="${day}" data-type="close" required>
+        `;
+        container.appendChild(row);
+    });
+}
+
+// Populate form with current settings
+function populateSettingsForm() {
+    const settings = loadSiteSettings();
+    
+    // Restaurant info
+    document.getElementById('restaurant-name').value = settings.restaurant.name;
+    document.getElementById('restaurant-tagline').value = settings.restaurant.tagline;
+    
+    // Contact info
+    document.getElementById('restaurant-phone').value = settings.contact.phone;
+    document.getElementById('restaurant-email').value = settings.contact.email;
+    document.getElementById('restaurant-address').value = settings.contact.address;
+    
+    // Hours
+    Object.entries(settings.hours).forEach(([day, times]) => {
+        const openInput = document.querySelector(`input[data-day="${day}"][data-type="open"]`);
+        const closeInput = document.querySelector(`input[data-day="${day}"][data-type="close"]`);
+        if (openInput && closeInput) {
+            openInput.value = times.open;
+            closeInput.value = times.close;
+        }
+    });
+}
+
+// Handle settings form submission
+document.getElementById('settings-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const settings = {
+        restaurant: {
+            name: document.getElementById('restaurant-name').value,
+            tagline: document.getElementById('restaurant-tagline').value
+        },
+        contact: {
+            phone: document.getElementById('restaurant-phone').value,
+            email: document.getElementById('restaurant-email').value,
+            address: document.getElementById('restaurant-address').value
+        },
+        hours: {}
+    };
+    
+    // Collect hours
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    days.forEach(day => {
+        const openInput = document.querySelector(`input[data-day="${day}"][data-type="open"]`);
+        const closeInput = document.querySelector(`input[data-day="${day}"][data-type="close"]`);
+        settings.hours[day] = {
+            open: openInput.value,
+            close: closeInput.value
+        };
+    });
+    
+    saveSiteSettings(settings);
+    closeSettingsModal();
+});
+
+// Modal management
+function openSettingsModal() {
+    populateSettingsForm();
+    ModalManagerOriginal.show('settings-modal');
+}
+
+function closeSettingsModal() {
+    ModalManagerOriginal.close();
+}
+
+// Add click handler for settings button
+document.getElementById('site-settings-btn').addEventListener('click', openSettingsModal);
+
+// Initialize settings if not exists
+if (!localStorage.getItem('siteSettings')) {
+    saveSiteSettings(defaultSettings);
+}

@@ -293,6 +293,31 @@
 3. Data validation checks
 4. Cross-browser compatibility
 
+## Known Issues (To Fix Later)
+
+#### Category Management (2024-12-11)
+1. New categories not appearing immediately after addition
+2. New menu items not being added properly
+3. Possible state management issue between localStorage and UI updates
+
+Root Cause (Initial Analysis):
+- Likely disconnect between state updates and UI refresh
+- Possible race condition in localStorage operations
+- Event handler chain may be broken
+
+To Fix Later:
+```javascript
+// TODO: Implement proper state management
+1. Add state validation
+2. Force UI refresh after state changes
+3. Add error boundaries around category operations
+4. Implement proper event propagation
+```
+
+Priority: Medium
+Impact: New content additions
+Workaround: Refresh page after adding new categories/items
+
 ## Best Practices
 
 ### 1. Code Organization
@@ -330,3 +355,119 @@
    - Check file size limits
    - Verify format support
    - Test preview function
+
+### Failed Approaches - Learning Log
+
+#### CMS Implementation Attempt 2 - Failed (2024-12-11)
+Problem: Multiple DOMContentLoaded event listeners causing race conditions and initialization failures
+
+What We Tried:
+```javascript
+// Failed approach - Don't repeat
+1. Consolidated all DOMContentLoaded listeners into one
+2. Added error handling and logging
+3. Tried to initialize modal handlers separately
+```
+
+Why It Failed:
+1. Race condition between auth check and UI initialization
+2. Modal elements not found because they're initialized after auth check
+3. Multiple DOMContentLoaded listeners still executing in unknown order
+4. Lost event listeners during DOM manipulation
+
+Root Cause Analysis:
+1. Authentication and UI initialization are tightly coupled
+2. DOM elements are queried before they're ready
+3. Event delegation not properly implemented
+4. Modal state management is inconsistent
+
+Better Approach Needed:
+1. Use event delegation for dynamic elements
+2. Implement proper state management for modals
+3. Separate auth flow from UI initialization
+4. Use a single source of truth for DOM ready state
+
+Example of Correct Pattern:
+```javascript
+// Single event listener with proper delegation
+document.addEventListener('DOMContentLoaded', () => {
+    // Auth check first
+    if (!validateSession()) {
+        showLoginOverlay();
+        return;
+    }
+    
+    // Event delegation for dynamic elements
+    document.body.addEventListener('click', (e) => {
+        if (e.target.matches('#add-category-btn')) {
+            showModal('category-modal');
+        }
+    });
+});
+
+// State management
+const modalState = {
+    currentModal: null,
+    show(modalId) {
+        this.currentModal = document.getElementById(modalId);
+        if (this.currentModal) {
+            this.currentModal.classList.add('active');
+        }
+    }
+};
+```
+
+#### CMS Implementation Attempt 3 - Failed (2024-12-11)
+Problem: Lost all CMS content when trying to improve modal and authentication
+
+What We Tried:
+```javascript
+// Failed approach - Don't repeat
+1. Moved state management around
+2. Changed initialization order
+3. Rewrote event handlers
+4. Modified existing working code instead of extending it
+```
+
+Why It Failed:
+1. Broke existing working code by moving it around
+2. Lost critical event handlers for CMS functionality
+3. Disrupted the working order of operations
+4. Modified core functionality instead of extending it
+
+Root Cause Analysis:
+1. Violated the "If it works, don't fix it" principle
+2. Made too many changes at once
+3. Didn't properly test existing functionality
+4. Failed to follow incremental development
+
+Correct Approach:
+1. Never modify working code - only extend it
+2. Add new features alongside existing ones
+3. Test each small change before moving forward
+4. Keep initialization order intact
+
+Example of Correct Pattern:
+```javascript
+// Extend existing functionality - don't replace it
+const existingInit = window.initFunction;
+window.initFunction = function() {
+    // Call existing init first
+    existingInit();
+    
+    // Then add new features
+    addNewFeature();
+};
+```
+
+Key Lessons:
+1. Always preserve working code
+2. Make incremental changes
+3. Test after each small change
+4. Add features by extending, not replacing
+
+Next Steps:
+1. Implement event delegation pattern
+2. Create modal state manager
+3. Separate auth and UI initialization
+4. Add proper error boundaries

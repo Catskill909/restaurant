@@ -195,6 +195,35 @@
             width: 500px;
         }
 
+        .settings-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-section h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .hours-row {
+            display: grid;
+            grid-template-columns: 100px 120px auto 120px;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-input {
+            width: 120px;
+        }
+
+        .hours-row span {
+            text-align: center;
+            color: var(--text-muted);
+        }
+
         .categories-list {
             margin-top: 2rem;
         }
@@ -291,6 +320,9 @@
         <header class="admin-header">
             <h1>Menu Management</h1>
             <div class="header-actions">
+                <button id="site-settings-btn" class="btn secondary">
+                    <i class="fas fa-cog"></i> Site Settings
+                </button>
                 <button id="add-category-btn" class="btn secondary">
                     <i class="fas fa-folder-plus"></i> Add Category
                 </button>
@@ -377,6 +409,63 @@
                     <!-- Categories will be listed here -->
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Site Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h2>Site Settings</h2>
+            <form id="settings-form">
+                <!-- Restaurant Info -->
+                <div class="settings-section">
+                    <h3>Restaurant Information</h3>
+                    <div class="form-group">
+                        <label for="restaurant-name">Restaurant Name</label>
+                        <input type="text" id="restaurant-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-tagline">Tagline</label>
+                        <input type="text" id="restaurant-tagline" class="form-control" required>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="settings-section">
+                    <h3>Contact Information</h3>
+                    <div class="form-group">
+                        <label for="restaurant-phone">Phone</label>
+                        <input type="tel" id="restaurant-phone" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-email">Email</label>
+                        <input type="email" id="restaurant-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-address">Address</label>
+                        <textarea id="restaurant-address" class="form-control" rows="2" required></textarea>
+                    </div>
+                </div>
+
+                <!-- Hours -->
+                <div class="settings-section">
+                    <h3>Business Hours</h3>
+                    <div id="hours-container">
+                        <div class="hours-row">
+                            <label>Monday</label>
+                            <input type="time" class="form-control time-input" data-day="monday" data-type="open" required>
+                            <span>to</span>
+                            <input type="time" class="form-control time-input" data-day="monday" data-type="close" required>
+                        </div>
+                        <!-- Other days will be added via JavaScript -->
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Save Settings</button>
+                    <button type="button" class="btn secondary" onclick="closeSettingsModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
