@@ -13,9 +13,10 @@ A modern, responsive restaurant website with menu management capabilities.
 
 ### Admin Panel
 - Menu item management (Add/Edit/Delete)
-- Category management with enhanced UX
-  - Animated success confirmations
-  - Clear visual feedback
+- Category management with drag and drop reordering
+  - Visual drop markers and indicators
+  - Smooth animations and transitions
+  - Automatic order saving
   - Real-time updates
 - Image upload with preview
 - User-friendly interface
@@ -25,8 +26,13 @@ A modern, responsive restaurant website with menu management capabilities.
 
 ### Built With
 - HTML5
+  - Drag and Drop API
 - CSS3
+  - Modern animations
+  - Smooth transitions
 - Vanilla JavaScript
+  - Event delegation
+  - Clean state management
 - localStorage for data persistence
 
 ### Key Components

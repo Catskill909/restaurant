@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2024-12-10
+
+### Added
+- Implemented drag and drop functionality for category reordering
+- Added visual drop markers between categories
+- Real-time order updates with automatic saving
+- Improved drag and drop feedback with visual indicators
+
+### Fixed
+- Resolved category reordering issues
+- Fixed event delegation for drag and drop handlers
+- Improved state management for dragged items
+- Enhanced drop target detection
+
+### Technical
+- Implemented proper event delegation for better performance
+- Added cleanup handlers for drag and drop operations
+- Improved state management for drag operations
+- Enhanced visual feedback system
+
 ## [1.0.0] - 2024-12-10
 
 ### Added

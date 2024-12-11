@@ -2,6 +2,8 @@
 let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
 let categories = JSON.parse(localStorage.getItem('categories')) || [];
 let editingId = null;
+let draggedItem = null;
+let draggedCategory = null;
 
 // DOM Elements
 const menuForm = document.getElementById('menu-form');
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get the button directly
     const addCategoryBtn = document.getElementById('add-category-btn');
     const categoryModal = document.getElementById('category-modal');
+    const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
     
     console.log('Add Category Button:', addCategoryBtn);
     console.log('Category Modal:', categoryModal);
@@ -41,11 +44,39 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Add Category button not found!');
     }
 
+    // Manage Categories Button
+    if (manageCategoriesBtn) {
+        manageCategoriesBtn.addEventListener('click', () => {
+            displayCategories();
+            categoryModal.classList.add('active');
+        });
+    }
+
     populateCategorySelect();
     displayMenuItems();
     displayCategories();
     initializeDragAndDrop();
     addDropMarkerStyle();
+
+    // Add close button
+    const modalContent = document.querySelector('.modal-content');
+    if (modalContent && !modalContent.querySelector('.modal-close')) {
+        const closeButton = document.createElement('button');
+        closeButton.className = 'modal-close';
+        closeButton.innerHTML = '&times;';
+        closeButton.onclick = closeModal;
+        modalContent.insertBefore(closeButton, modalContent.firstChild);
+    }
+
+    // Click outside to close
+    const modal = document.getElementById('category-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
 });
 
 // Image Preview
@@ -184,7 +215,7 @@ function displayCategories() {
                             <i class="fas fa-grip-vertical"></i>
                         </div>
                         <span>${category}</span>
-                        <button onclick="deleteCategory('${category}')" class="action-btn">
+                        <button onclick="handleDeleteCategory('${category}')" class="action-btn">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -192,27 +223,6 @@ function displayCategories() {
             `).join('')}
         </div>
     `;
-
-    // Add drag and drop event listeners
-    const categoryItems = document.querySelectorAll('.category-item');
-    categoryItems.forEach(item => {
-        item.addEventListener('dragstart', handleCategoryDragStart);
-        item.addEventListener('dragend', handleCategoryDragEnd);
-        item.addEventListener('dragover', handleDragOver);
-        item.addEventListener('drop', handleCategoryDrop);
-        item.addEventListener('dragenter', (e) => {
-            e.preventDefault();
-            if (e.target.closest('.category-item') !== draggedCategory) {
-                e.target.closest('.category-item').classList.add('drop-target');
-            }
-        });
-        item.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            if (e.target.closest('.category-item')) {
-                e.target.closest('.category-item').classList.remove('drop-target');
-            }
-        });
-    });
 
     // Add save button listener
     const saveBtn = document.getElementById('saveCategoriesBtn');
@@ -250,12 +260,6 @@ function closeModal() {
         modal.classList.remove('active');
     }
 }
-
-// Category management button
-document.getElementById('manageCategoriesBtn').addEventListener('click', () => {
-    displayCategories();
-    categoryModal.classList.add('active');
-});
 
 function populateCategorySelect() {
     const select = document.getElementById('item-category');
@@ -300,7 +304,7 @@ function deleteMenuItem(id) {
 }
 
 // Category Management
-function deleteCategory(category) {
+function handleDeleteCategory(category) {
     if (confirm(`Delete category "${category}"? This will not delete the items in this category.`)) {
         categories = categories.filter(c => c !== category);
         localStorage.setItem('categories', JSON.stringify(categories));
@@ -308,6 +312,14 @@ function deleteCategory(category) {
         displayCategories();
         showToast('Category deleted successfully!', 'success');
     }
+}
+
+function handleSaveCategories() {
+    localStorage.setItem('categories', JSON.stringify(categories));
+    populateCategorySelect();
+    displayMenuItems();
+    closeModal();
+    showToast('Categories saved successfully!', 'success');
 }
 
 // Utility Functions
@@ -346,16 +358,17 @@ const modalContent = document.querySelector('.modal-content');
 if (modalContent && !modalContent.querySelector('.modal-close')) {
     const closeButton = document.createElement('button');
     closeButton.className = 'modal-close';
-    closeButton.innerHTML = '×';
+    closeButton.innerHTML = '&times;';
     closeButton.onclick = closeModal;
     modalContent.insertBefore(closeButton, modalContent.firstChild);
 }
 
 // Category Drag and Drop Functions
-let draggedCategory = null;
-
 function handleCategoryDragStart(e) {
-    draggedCategory = e.target.closest('.category-item');
+    const categoryItem = e.target.closest('.category-item');
+    if (!categoryItem) return;
+
+    draggedCategory = categoryItem;
     draggedCategory.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', draggedCategory.dataset.category);
@@ -374,7 +387,7 @@ function handleCategoryDragEnd(e) {
     });
 }
 
-function handleDragOver(e) {
+function handleCategoryDragOver(e) {
     e.preventDefault();
     e.stopPropagation();
     
@@ -431,18 +444,53 @@ function handleCategoryDrop(e) {
     marker.remove();
     draggedCategory = null;
     
-    // Update display
+    // Update display and save
     displayCategories();
+    localStorage.setItem('categories', JSON.stringify(categories));
+    showToast('Category order updated', 'success');
 }
 
-// Drag and drop handlers
-let draggedItem = null;
+// Initialize category drag and drop
+document.addEventListener('DOMContentLoaded', () => {
+    const categoriesList = document.getElementById('categories-list');
+    if (categoriesList) {
+        categoriesList.addEventListener('dragstart', handleCategoryDragStart);
+        categoriesList.addEventListener('dragend', handleCategoryDragEnd);
+        categoriesList.addEventListener('dragover', handleCategoryDragOver);
+        categoriesList.addEventListener('drop', handleCategoryDrop);
+    }
+});
 
+// Drag and drop handlers
 function initializeDragAndDrop() {
-    document.addEventListener('dragstart', handleDragStart);
-    document.addEventListener('dragend', handleDragEnd);
-    document.addEventListener('dragover', handleDragOver);
-    document.addEventListener('drop', handleDrop);
+    // Menu items drag and drop only
+    document.addEventListener('dragstart', (e) => {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem) {
+            handleDragStart(e);
+        }
+    });
+
+    document.addEventListener('dragend', (e) => {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem) {
+            handleDragEnd(e);
+        }
+    });
+
+    document.addEventListener('dragover', (e) => {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem) {
+            handleDragOver(e);
+        }
+    });
+
+    document.addEventListener('drop', (e) => {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem) {
+            handleDrop(e);
+        }
+    });
 }
 
 function handleDragStart(e) {
@@ -498,7 +546,7 @@ function handleDragOver(e) {
     const mouseY = e.clientY - rect.top;
     const threshold = rect.height * 0.25;
     
-    // Remove existing drop markers
+    // Remove existing markers
     container.querySelectorAll('.drop-marker').forEach(marker => marker.remove());
 
     // Create and position drop marker
@@ -574,6 +622,39 @@ function handleDrop(e) {
 function addDropMarkerStyle() {
     const style = document.createElement('style');
     style.textContent = `
+        .modal-content {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        
+        .modal-content::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .modal-content:hover {
+            scrollbar-width: thin;
+            -ms-overflow-style: auto;
+        }
+        
+        .modal-content:hover::-webkit-scrollbar {
+            display: block;
+            width: 8px;
+        }
+        
+        .modal-content:hover::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .modal-content:hover::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        
+        .modal-content:hover::-webkit-scrollbar-thumb:hover {
+            background: #fff;
+        }
+        
         .modal-close {
             position: absolute;
             right: 15px;
@@ -583,6 +664,8 @@ function addDropMarkerStyle() {
             font-size: 24px;
             cursor: pointer;
             color: #E6C9A8;
+            padding: 5px;
+            line-height: 1;
             z-index: 1000;
         }
         .modal-close:hover {
