@@ -27,6 +27,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved state management for drag operations
 - Enhanced visual feedback system
 
+## [Security Update] - 2024-12-11
+### Added
+- Secure password hashing using SHA-256
+- Session management with 30-minute timeout
+- Rate limiting for login attempts (5 attempts, 30-second lockout)
+- Session tokens using crypto.getRandomValues()
+
+### Changed
+- Replaced plain text password with hashed version
+- Improved login form UI and error messages
+- Enhanced session validation with auto-extension
+
+### Security
+- Default admin password is now 'admin'
+- Added protection against brute force attacks
+- Implemented proper session expiry
+- Added secure token generation
+
 ## [1.0.0] - 2024-12-10
 
 ### Added

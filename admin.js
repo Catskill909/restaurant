@@ -1,22 +1,92 @@
 // Password Protection
-const ADMIN_PASSWORD = 'cascade';  // Change this to your desired password
+const CONFIG = {
+    ADMIN_PASSWORD_HASH: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // Hash of 'admin'
+    MAX_LOGIN_ATTEMPTS: 5,
+    LOCKOUT_TIME: 30000, // 30 seconds
+    SESSION_DURATION: 1800000 // 30 minutes
+};
 
-function checkPassword() {
-    const password = document.getElementById('adminPassword').value;
-    if (password === ADMIN_PASSWORD) {
-        localStorage.setItem('adminAuthenticated', 'true');
-        document.getElementById('loginOverlay').style.display = 'none';
-    } else {
-        document.getElementById('loginError').style.display = 'block';
-        setTimeout(() => {
-            document.getElementById('loginError').style.display = 'none';
-        }, 3000);
+// Login attempt tracking
+let loginAttempts = 0;
+let lockoutUntil = 0;
+
+// Hash password using SHA-256
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Generate session token
+function generateSessionToken() {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// Check password with rate limiting
+async function checkPassword() {
+    const now = Date.now();
+    if (now < lockoutUntil) {
+        const waitSeconds = Math.ceil((lockoutUntil - now) / 1000);
+        showToast(`Too many attempts. Try again in ${waitSeconds} seconds`, 'error');
+        return false;
     }
+
+    const password = document.getElementById('adminPassword').value;
+    const hashedInput = await hashPassword(password);
+    
+    if (hashedInput === CONFIG.ADMIN_PASSWORD_HASH) {
+        // Reset login attempts on success
+        loginAttempts = 0;
+        
+        // Generate and store session token
+        const token = generateSessionToken();
+        const expiry = Date.now() + CONFIG.SESSION_DURATION;
+        
+        sessionStorage.setItem('adminToken', token);
+        sessionStorage.setItem('sessionExpiry', expiry.toString());
+        localStorage.setItem('adminAuthenticated', 'true');
+        
+        document.getElementById('loginOverlay').style.display = 'none';
+        showToast('Login successful', 'success');
+        return true;
+    } else {
+        loginAttempts++;
+        if (loginAttempts >= CONFIG.MAX_LOGIN_ATTEMPTS) {
+            lockoutUntil = now + CONFIG.LOCKOUT_TIME;
+            showToast(`Too many failed attempts. Locked out for ${CONFIG.LOCKOUT_TIME / 1000} seconds`, 'error');
+        } else {
+            showToast(`Invalid password. ${CONFIG.MAX_LOGIN_ATTEMPTS - loginAttempts} attempts remaining`, 'error');
+        }
+        return false;
+    }
+}
+
+// Validate session
+function validateSession() {
+    const token = sessionStorage.getItem('adminToken');
+    const expiry = parseInt(sessionStorage.getItem('sessionExpiry') || '0');
+    const now = Date.now();
+
+    if (!token || !expiry || now > expiry) {
+        // Session expired or invalid
+        sessionStorage.removeItem('adminToken');
+        sessionStorage.removeItem('sessionExpiry');
+        localStorage.removeItem('adminAuthenticated');
+        return false;
+    }
+
+    // Extend session on activity
+    sessionStorage.setItem('sessionExpiry', (now + CONFIG.SESSION_DURATION).toString());
+    return true;
 }
 
 // Check authentication status on page load
 document.addEventListener('DOMContentLoaded', () => {
-    const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true';
+    const isAuthenticated = validateSession();
     if (!isAuthenticated) {
         document.getElementById('loginOverlay').style.display = 'flex';
     } else {
