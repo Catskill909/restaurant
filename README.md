@@ -80,6 +80,25 @@ A modern, responsive restaurant website with menu management capabilities.
    - View success confirmations
    - See real-time updates
 
+## Admin Access
+
+The admin panel is protected with a simple password system. To access the admin area:
+
+1. Navigate to `admin.html`
+2. Enter the password: `cascade`
+3. Click Login or press Enter
+
+The authentication status persists across page refreshes until you clear your browser data.
+
+To change the admin password:
+1. Open `admin.js`
+2. Locate the `ADMIN_PASSWORD` constant at the top of the file
+3. Change the value to your desired password
+
+## Category Management
+
+Categories can be reordered in the admin panel using drag and drop. The order is automatically synchronized with the front-end display. Changes made in the admin panel are immediately reflected on the main page.
+
 ## Development
 
 ### Current Status

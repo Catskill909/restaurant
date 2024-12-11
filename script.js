@@ -6,8 +6,9 @@ function displayMenuItems() {
     const menuGrid = document.getElementById('menu-items');
     if (!menuGrid) return;
     
-    // Get menu items from localStorage (temporary solution until we have a server)
+    // Get menu items and categories from localStorage
     const items = JSON.parse(localStorage.getItem('menuItems')) || [];
+    const categories = JSON.parse(localStorage.getItem('categories')) || [];
     
     // Clear the menu grid
     menuGrid.innerHTML = '';
@@ -26,11 +27,9 @@ function displayMenuItems() {
         return acc;
     }, {});
     
-    // Sort categories alphabetically
-    const sortedCategories = Object.entries(itemsByCategory).sort((a, b) => a[0].localeCompare(b[0]));
-    
-    // Create a container for each category
-    sortedCategories.forEach(([category, items]) => {
+    // Use categories array to maintain admin-defined order
+    categories.forEach(category => {
+        const items = itemsByCategory[category];
         if (items && items.length > 0) {
             const categorySection = document.createElement('div');
             categorySection.className = 'menu-category';

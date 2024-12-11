@@ -1,3 +1,29 @@
+// Password Protection
+const ADMIN_PASSWORD = 'cascade';  // Change this to your desired password
+
+function checkPassword() {
+    const password = document.getElementById('adminPassword').value;
+    if (password === ADMIN_PASSWORD) {
+        localStorage.setItem('adminAuthenticated', 'true');
+        document.getElementById('loginOverlay').style.display = 'none';
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('loginError').style.display = 'none';
+        }, 3000);
+    }
+}
+
+// Check authentication status on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true';
+    if (!isAuthenticated) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+    } else {
+        document.getElementById('loginOverlay').style.display = 'none';
+    }
+});
+
 // State Management
 let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
 let categories = JSON.parse(localStorage.getItem('categories')) || [];

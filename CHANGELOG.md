@@ -51,3 +51,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented localStorage for data persistence
 - Added responsive design breakpoints
 - Set up version control with Git
+
+## December 11, 2024
+
+### Added
+- Admin panel password protection
+  - Simple one-word password system
+  - Clean login overlay interface
+  - Persistent authentication using localStorage
+  - Default password: "cascade"
+- Category order synchronization
+  - Front-end now displays categories in the same order as admin panel
+  - Removed alphabetical sorting of categories
+  - Real-time updates when category order changes
