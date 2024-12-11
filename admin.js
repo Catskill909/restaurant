@@ -1,6 +1,6 @@
 // State Management
 let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
-let categories = JSON.parse(localStorage.getItem('categories')) || ['Appetizers', 'Main Course', 'Desserts', 'Drinks'];
+let categories = JSON.parse(localStorage.getItem('categories')) || [];
 let editingId = null;
 
 // DOM Elements
@@ -9,7 +9,6 @@ const menuCategories = document.getElementById('menu-categories');
 const categoryModal = document.getElementById('category-modal');
 const categoryForm = document.getElementById('category-form');
 const categoriesList = document.getElementById('categories-list');
-const addCategoryBtn = document.getElementById('add-category-btn');
 const cancelEditBtn = document.getElementById('cancel-edit');
 const formTitle = document.getElementById('form-title');
 const imageInput = document.getElementById('item-image');
@@ -17,9 +16,36 @@ const imagePreview = document.getElementById('image-preview').querySelector('img
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded');
+    
+    // Get the button directly
+    const addCategoryBtn = document.getElementById('add-category-btn');
+    const categoryModal = document.getElementById('category-modal');
+    
+    console.log('Add Category Button:', addCategoryBtn);
+    console.log('Category Modal:', categoryModal);
+    
+    // Add Category Button
+    if (addCategoryBtn) {
+        console.log('Adding click listener to Add Category button');
+        addCategoryBtn.addEventListener('click', function() {
+            console.log('Add Category button clicked');
+            if (categoryModal) {
+                categoryModal.classList.add('active');
+                console.log('Added active class to modal');
+            } else {
+                console.error('Category modal not found');
+            }
+        });
+    } else {
+        console.error('Add Category button not found!');
+    }
+
     populateCategorySelect();
     displayMenuItems();
     displayCategories();
+    initializeDragAndDrop();
+    addDropMarkerStyle();
 });
 
 // Image Preview
@@ -77,30 +103,25 @@ menuForm.addEventListener('submit', async (e) => {
 function displayMenuItems() {
     menuCategories.innerHTML = '';
     
-    // Group items by category
-    const itemsByCategory = menuItems.reduce((acc, item) => {
-        if (!acc[item.category]) {
-            acc[item.category] = [];
-        }
-        acc[item.category].push(item);
-        return acc;
-    }, {});
+    // Group items by category while preserving order
+    const itemsByCategory = {};
+    categories.forEach(category => {
+        // Get items for this category in their current order
+        itemsByCategory[category] = menuItems.filter(item => item.category === category);
+    });
     
-    // Sort categories alphabetically
-    const sortedCategories = Object.keys(itemsByCategory).sort();
-    
-    // Create category sections
-    sortedCategories.forEach(category => {
+    // Display categories in order
+    categories.forEach(category => {
         const items = itemsByCategory[category];
-        if (items.length > 0) {
+        if (items && items.length > 0) {
             const section = document.createElement('div');
             section.className = 'menu-category';
             
             section.innerHTML = `
                 <h3>${category} <span class="category-count">(${items.length})</span></h3>
-                <div class="menu-items">
-                    ${items.map(item => `
-                        <div class="menu-item" data-category="${item.category}">
+                <div class="menu-items" data-category="${category}">
+                    ${items.map((item, index) => `
+                        <div class="menu-item" draggable="true" data-item-id="${item.id}" data-category="${item.category}" data-index="${index}">
                             <div class="menu-item-image">
                                 <img 
                                     src="${item.image || 'placeholder.jpg'}" 
@@ -148,17 +169,93 @@ function displayMenuItems() {
 }
 
 function displayCategories() {
-    categoriesList.innerHTML = categories.map(category => `
-        <div class="category-item">
-            <span>${category}</span>
-            ${category !== 'Appetizers' && category !== 'Main Course' && category !== 'Desserts' && category !== 'Drinks' ? 
-                `<button onclick="deleteCategory('${category}')" class="action-btn delete">
-                    <i class="fas fa-trash"></i>
-                </button>` : ''
-            }
+    categoriesList.innerHTML = `
+        <div class="categories-header">
+            <h3>Current Categories</h3>
+            <button id="saveCategoriesBtn" class="primary-btn" style="background: #E6C9A8; color: #1a1a1a; font-weight: 600;">
+                <i class="fas fa-save"></i> Save Order
+            </button>
         </div>
-    `).join('');
+        <div class="categories-list">
+            ${categories.map((category, index) => `
+                <div class="category-item" draggable="true" data-category="${category}">
+                    <div class="category-content">
+                        <div class="drag-handle">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        <span>${category}</span>
+                        <button onclick="deleteCategory('${category}')" class="action-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    // Add drag and drop event listeners
+    const categoryItems = document.querySelectorAll('.category-item');
+    categoryItems.forEach(item => {
+        item.addEventListener('dragstart', handleCategoryDragStart);
+        item.addEventListener('dragend', handleCategoryDragEnd);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('drop', handleCategoryDrop);
+        item.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            if (e.target.closest('.category-item') !== draggedCategory) {
+                e.target.closest('.category-item').classList.add('drop-target');
+            }
+        });
+        item.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (e.target.closest('.category-item')) {
+                e.target.closest('.category-item').classList.remove('drop-target');
+            }
+        });
+    });
+
+    // Add save button listener
+    const saveBtn = document.getElementById('saveCategoriesBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            localStorage.setItem('categories', JSON.stringify(categories));
+            populateCategorySelect();
+            displayMenuItems();
+            closeModal();
+            showToast('Categories saved successfully!', 'success');
+        });
+    }
 }
+
+function addNewCategory() {
+    const input = document.getElementById('new-category-name');
+    const newCategory = input.value.trim();
+    
+    if (newCategory) {
+        if (categories.includes(newCategory)) {
+            showToast('Category already exists!', 'error');
+            return;
+        }
+        
+        categories.push(newCategory);
+        input.value = '';
+        displayCategories();
+        showToast('Category added successfully!', 'success');
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('category-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Category management button
+document.getElementById('manageCategoriesBtn').addEventListener('click', () => {
+    displayCategories();
+    categoryModal.classList.add('active');
+});
 
 function populateCategorySelect() {
     const select = document.getElementById('item-category');
@@ -213,10 +310,321 @@ function deleteCategory(category) {
     }
 }
 
-// Add Category Button
-addCategoryBtn.addEventListener('click', () => {
-    categoryModal.classList.add('active');
+// Utility Functions
+function resetForm() {
+    editingId = null;
+    formTitle.textContent = 'Add Menu Item';
+    menuForm.reset();
+    imagePreview.src = 'https://via.placeholder.com/150';
+    cancelEditBtn.style.display = 'none';
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type} show`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Event Listeners
+cancelEditBtn.addEventListener('click', resetForm);
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('category-modal');
+    if (e.target === modal) {
+        closeModal();
+    }
 });
+
+// Add close button to modal
+const modalContent = document.querySelector('.modal-content');
+if (modalContent && !modalContent.querySelector('.modal-close')) {
+    const closeButton = document.createElement('button');
+    closeButton.className = 'modal-close';
+    closeButton.innerHTML = '×';
+    closeButton.onclick = closeModal;
+    modalContent.insertBefore(closeButton, modalContent.firstChild);
+}
+
+// Category Drag and Drop Functions
+let draggedCategory = null;
+
+function handleCategoryDragStart(e) {
+    draggedCategory = e.target.closest('.category-item');
+    draggedCategory.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', draggedCategory.dataset.category);
+}
+
+function handleCategoryDragEnd(e) {
+    if (draggedCategory) {
+        draggedCategory.classList.remove('dragging');
+        draggedCategory = null;
+    }
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.classList.remove('drop-target');
+    });
+    document.querySelectorAll('.drop-marker').forEach(marker => {
+        marker.remove();
+    });
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const item = e.target.closest('.category-item');
+    if (!item || item === draggedCategory) return;
+    
+    const rect = item.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const height = rect.height;
+    
+    // Remove existing markers
+    document.querySelectorAll('.drop-marker').forEach(m => m.remove());
+    
+    // Create and position marker
+    const marker = document.createElement('div');
+    marker.className = 'drop-marker';
+    
+    if (y < height / 2) {
+        item.parentNode.insertBefore(marker, item);
+    } else {
+        item.parentNode.insertBefore(marker, item.nextSibling);
+    }
+}
+
+function handleCategoryDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const marker = document.querySelector('.drop-marker');
+    if (!marker || !draggedCategory) return;
+    
+    const dropTarget = marker.nextElementSibling;
+    const draggedCategoryName = draggedCategory.dataset.category;
+    
+    // Get indices
+    const fromIndex = categories.indexOf(draggedCategoryName);
+    let toIndex = dropTarget ? 
+        categories.indexOf(dropTarget.dataset.category) : 
+        categories.length;
+    
+    if (fromIndex === -1) return;
+    if (toIndex === -1) toIndex = categories.length;
+    
+    // Remove dragged item
+    categories.splice(fromIndex, 1);
+    
+    // If dropping after the original position, we need to adjust the insert position
+    if (toIndex > fromIndex) toIndex--;
+    
+    // Insert at new position
+    categories.splice(toIndex, 0, draggedCategoryName);
+    
+    // Clean up
+    marker.remove();
+    draggedCategory = null;
+    
+    // Update display
+    displayCategories();
+}
+
+// Drag and drop handlers
+let draggedItem = null;
+
+function initializeDragAndDrop() {
+    document.addEventListener('dragstart', handleDragStart);
+    document.addEventListener('dragend', handleDragEnd);
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('drop', handleDrop);
+}
+
+function handleDragStart(e) {
+    const menuItem = e.target.closest('.menu-item');
+    if (!menuItem) return;
+
+    draggedItem = menuItem;
+    e.dataTransfer.effectAllowed = 'move';
+    menuItem.classList.add('dragging');
+
+    // Set the item's ID as the drag data
+    e.dataTransfer.setData('text/plain', menuItem.dataset.itemId);
+}
+
+function handleDragEnd(e) {
+    const menuItem = e.target.closest('.menu-item');
+    if (!menuItem) return;
+
+    menuItem.classList.remove('dragging');
+    draggedItem = null;
+
+    // Remove drag-over class from all containers
+    document.querySelectorAll('.menu-items').forEach(container => {
+        container.classList.remove('drag-over');
+    });
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const container = e.target.closest('.menu-items');
+    if (!container || !draggedItem) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Remove drag-over class from all containers
+    document.querySelectorAll('.menu-items').forEach(el => {
+        el.classList.remove('drag-over');
+    });
+
+    // Add drag-over class to current container
+    container.classList.add('drag-over');
+    e.dataTransfer.dropEffect = 'move';
+
+    // Find the closest menu item
+    const closestItem = e.target.closest('.menu-item');
+    if (!closestItem || closestItem === draggedItem) return;
+
+    // Get mouse position relative to the item
+    const rect = closestItem.getBoundingClientRect();
+    const mouseY = e.clientY - rect.top;
+    const threshold = rect.height * 0.25;
+    
+    // Remove existing drop markers
+    container.querySelectorAll('.drop-marker').forEach(marker => marker.remove());
+
+    // Create and position drop marker
+    const marker = document.createElement('div');
+    marker.className = 'drop-marker';
+    
+    if (mouseY > threshold) {
+        closestItem.parentNode.insertBefore(marker, closestItem.nextSibling);
+    } else {
+        closestItem.parentNode.insertBefore(marker, closestItem);
+    }
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const container = e.target.closest('.menu-items');
+    if (!container || !draggedItem) return;
+
+    const newCategory = container.dataset.category;
+    const itemId = draggedItem.dataset.itemId;
+    const oldCategory = draggedItem.dataset.category;
+
+    // Get the item being dropped on
+    const targetItem = e.target.closest('.menu-item');
+    
+    // Find the dragged item in the menuItems array
+    const draggedItemIndex = menuItems.findIndex(item => item.id === itemId);
+    if (draggedItemIndex === -1) return;
+
+    // Remove the item from its current position
+    const [movedItem] = menuItems.splice(draggedItemIndex, 1);
+    movedItem.category = newCategory;
+
+    // If dropping directly on a category container (not on an item)
+    if (!targetItem) {
+        // Add to the end of the category
+        const lastCategoryItemIndex = menuItems.findLastIndex(item => item.category === newCategory);
+        const insertIndex = lastCategoryItemIndex === -1 ? menuItems.length : lastCategoryItemIndex + 1;
+        menuItems.splice(insertIndex, 0, movedItem);
+    } else {
+        // Get the target item's position
+        const targetItemId = targetItem.dataset.itemId;
+        const targetIndex = menuItems.findIndex(item => item.id === targetItemId);
+        
+        // Get mouse position relative to the target item
+        const rect = targetItem.getBoundingClientRect();
+        const mouseY = e.clientY - rect.top;
+        const threshold = rect.height * 0.75;
+        
+        // Insert before or after based on mouse position
+        let insertIndex;
+        if (mouseY <= threshold) {
+            insertIndex = targetIndex;
+        } else {
+            insertIndex = targetIndex + 1;
+        }
+
+        // Adjust index if we're moving within the same category and moving down
+        if (oldCategory === newCategory && draggedItemIndex < targetIndex) {
+            insertIndex--;
+        }
+
+        menuItems.splice(insertIndex, 0, movedItem);
+    }
+
+    // Update localStorage and refresh display
+    localStorage.setItem('menuItems', JSON.stringify(menuItems));
+    displayMenuItems();
+}
+
+function addDropMarkerStyle() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .modal-close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #E6C9A8;
+            z-index: 1000;
+        }
+        .modal-close:hover {
+            color: #fff;
+        }
+        .drop-marker {
+            height: 2px;
+            background-color: #E6C9A8;
+            margin: 4px 0;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .drop-marker::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -3px;
+            width: 8px;
+            height: 8px;
+            background-color: #E6C9A8;
+            border-radius: 50%;
+        }
+        .category-item.dragging {
+            opacity: 0.5;
+            cursor: move;
+        }
+        .category-item.drop-target {
+            border: 2px dashed #E6C9A8;
+            background: rgba(230, 201, 168, 0.1);
+        }
+        .category-item {
+            cursor: move;
+            user-select: none;
+            margin: 4px 0;
+            padding: 8px;
+            background: var(--dark-bg);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+    `;
+    document.head.appendChild(style);
+}
 
 // Category Form Submission
 categoryForm.addEventListener('submit', (e) => {
@@ -271,38 +679,4 @@ categoryForm.addEventListener('submit', (e) => {
             document.getElementById('category-form').addEventListener('submit', categoryForm.onsubmit);
         }, 300);
     }, 2000);
-});
-
-// Utility Functions
-function resetForm() {
-    editingId = null;
-    formTitle.textContent = 'Add Menu Item';
-    menuForm.reset();
-    imagePreview.src = 'https://via.placeholder.com/150';
-    cancelEditBtn.style.display = 'none';
-}
-
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type} show`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
-
-function closeModal() {
-    categoryModal.classList.remove('active');
-}
-
-// Event Listeners
-cancelEditBtn.addEventListener('click', resetForm);
-
-// Close modal when clicking outside
-categoryModal.addEventListener('click', (e) => {
-    if (e.target === categoryModal) {
-        closeModal();
-    }
 });
