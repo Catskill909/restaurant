@@ -304,12 +304,12 @@
     <div id="loginOverlay" class="login-overlay">
         <div class="login-container">
             <h2>Admin Login</h2>
-            <form id="login-form" onsubmit="return false;">
+            <form id="login-form">
                 <div class="form-group">
                     <label for="adminPassword">Password</label>
                     <input type="password" id="adminPassword" required>
                 </div>
-                <button type="submit" onclick="checkPassword()" id="login-btn">Login</button>
+                <button type="submit" class="btn primary">Login</button>
                 <div id="loginError" class="error-message" style="display: none;">
                     Invalid password. Please try again.
                 </div>
@@ -399,71 +399,81 @@
             <form id="category-form">
                 <div class="form-group">
                     <label for="category-name">New Category Name</label>
-                    <input type="text" id="category-name" class="form-control" required>
+                    <input type="text" id="category-name" required>
                 </div>
-                <button type="submit" class="btn primary">Add Category</button>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Add Category</button>
+                </div>
             </form>
-            
-            <div class="categories-list-container">
-                <div id="categories-list" class="categories-list">
-                    <!-- Categories will be listed here -->
-                </div>
+            <div id="categories-list">
+                <!-- Categories will be listed here -->
             </div>
         </div>
     </div>
 
-    <!-- Site Settings Modal -->
+    <!-- Settings Modal -->
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <h2>Site Settings</h2>
+            <h3>Site Settings</h3>
             <form id="settings-form">
                 <!-- Restaurant Info -->
                 <div class="settings-section">
-                    <h3>Restaurant Information</h3>
+                    <h4>Restaurant Info</h4>
                     <div class="form-group">
                         <label for="restaurant-name">Restaurant Name</label>
-                        <input type="text" id="restaurant-name" class="form-control" required>
+                        <input type="text" id="restaurant-name" required>
                     </div>
                     <div class="form-group">
                         <label for="restaurant-tagline">Tagline</label>
-                        <input type="text" id="restaurant-tagline" class="form-control" required>
+                        <input type="text" id="restaurant-tagline" required>
+                    </div>
+                </div>
+
+                <!-- Story Section -->
+                <div class="settings-section">
+                    <h4>Story Section</h4>
+                    <div class="form-group">
+                        <label for="story-title">Title</label>
+                        <input type="text" id="story-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="story-lead">Lead Text</label>
+                        <input type="text" id="story-lead" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="story-content">Content</label>
+                        <textarea id="story-content" rows="4" required></textarea>
                     </div>
                 </div>
 
                 <!-- Contact Info -->
                 <div class="settings-section">
-                    <h3>Contact Information</h3>
+                    <h4>Contact Info</h4>
                     <div class="form-group">
                         <label for="restaurant-phone">Phone</label>
-                        <input type="tel" id="restaurant-phone" class="form-control" required>
+                        <input type="tel" id="restaurant-phone" required>
                     </div>
                     <div class="form-group">
                         <label for="restaurant-email">Email</label>
-                        <input type="email" id="restaurant-email" class="form-control" required>
+                        <input type="email" id="restaurant-email" required>
                     </div>
                     <div class="form-group">
                         <label for="restaurant-address">Address</label>
-                        <textarea id="restaurant-address" class="form-control" rows="2" required></textarea>
+                        <input type="text" id="restaurant-address" required>
                     </div>
                 </div>
 
-                <!-- Hours -->
+                <!-- Business Hours -->
                 <div class="settings-section">
-                    <h3>Business Hours</h3>
+                    <h4>Business Hours</h4>
                     <div id="hours-container">
-                        <div class="hours-row">
-                            <label>Monday</label>
-                            <input type="time" class="form-control time-input" data-day="monday" data-type="open" required>
-                            <span>to</span>
-                            <input type="time" class="form-control time-input" data-day="monday" data-type="close" required>
-                        </div>
-                        <!-- Other days will be added via JavaScript -->
+                        <!-- Hours inputs will be dynamically added here -->
                     </div>
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn primary">Save Settings</button>
-                    <button type="button" class="btn secondary" onclick="closeSettingsModal()">Cancel</button>
+                    <button type="button" class="btn secondary modal-close">Cancel</button>
                 </div>
             </form>
         </div>

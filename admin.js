@@ -84,6 +84,23 @@ function validateSession() {
     return true;
 }
 
+// Modal Management
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
 // Modal State Management - Enhancement
 const ModalManager = {
     activeModal: null,
@@ -172,6 +189,31 @@ window.closeSettingsModal = function() {
     ModalManager.close();
 };
 
+// Modal Management
+const settingsModal = document.getElementById('settings-modal');
+const siteSettingsBtn = document.getElementById('site-settings-btn');
+
+// Open settings modal
+siteSettingsBtn.addEventListener('click', () => {
+    settingsModal.style.display = 'block';
+    populateSettingsForm();
+});
+
+// Close modals when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+    }
+});
+
+// Close modals when clicking close button
+document.querySelectorAll('.modal-close').forEach(button => {
+    button.addEventListener('click', () => {
+        const modal = button.closest('.modal');
+        if (modal) modal.style.display = 'none';
+    });
+});
+
 // Modal State Management
 const ModalManagerOriginal = {
     activeModal: null,
@@ -214,73 +256,42 @@ const ModalManagerOriginal = {
     }
 };
 
-// Single DOMContentLoaded handler with proper initialization order
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize admin panel
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM Content Loaded - Starting initialization');
     
-    // Check authentication first
-    const isAuthenticated = validateSession();
-    if (!isAuthenticated) {
-        document.getElementById('loginOverlay').style.display = 'flex';
-        return;
+    // Setup login form
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            await checkPassword();
+        };
     }
-    document.getElementById('loginOverlay').style.display = 'none';
     
-    // Initialize modal system
-    ModalManagerOriginal.init();
-    
-    // Use event delegation for all button clicks
-    document.body.addEventListener('click', (e) => {
-        // Find closest button if clicked element is a child (like an icon)
-        const button = e.target.closest('button');
-        if (!button) return;
+    // Check authentication
+    if (!validateSession()) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+    } else {
+        document.getElementById('loginOverlay').style.display = 'none';
         
-        switch (button.id) {
-            case 'add-category-btn':
-                e.preventDefault();
-                ModalManagerOriginal.show('category-modal');
-                break;
-                
-            case 'site-settings-btn':
-                e.preventDefault();
-                ModalManagerOriginal.show('settings-modal');
-                break;
-                
-            case 'manageCategoriesBtn':
-                e.preventDefault();
-                displayCategories();
-                ModalManagerOriginal.show('category-modal');
-                break;
-        }
-    });
-    
-    // Initialize UI components
-    try {
-        populateCategorySelect();
+        // Initialize components
+        ModalManager.init();
+        initializeHours();
         displayMenuItems();
         displayCategories();
-        initializeDragAndDrop();
-        loadSiteSettings();
-        console.log('UI components initialized');
-    } catch (err) {
-        console.error('Error initializing UI:', err);
-        showToast('Error initializing interface', 'error');
+        populateCategorySelect();
+        
+        // Add category button handler
+        const addCategoryBtn = document.getElementById('add-category-btn');
+        if (addCategoryBtn) {
+            addCategoryBtn.onclick = (e) => {
+                e.preventDefault();
+                ModalManager.show('category-modal');
+            };
+        }
     }
 });
-
-// Update existing functions to use ModalManager
-function closeModal() {
-    ModalManagerOriginal.close();
-}
-
-function openSettingsModal() {
-    populateSettingsForm();
-    ModalManagerOriginal.show('settings-modal');
-}
-
-function closeSettingsModal() {
-    ModalManagerOriginal.close();
-}
 
 // State Management
 let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
@@ -924,70 +935,43 @@ function addDropMarkerStyle() {
 }
 
 // Category Form Submission
-categoryForm.addEventListener('submit', (e) => {
+document.getElementById('category-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const categoryName = document.getElementById('category-name').value.trim();
     
-    if (!categoryName) {
-        showToast('Please enter a category name', 'warning');
-        return;
+    if (categoryName) {
+        // Add new category
+        categories.push({
+            id: Date.now().toString(),
+            name: categoryName,
+            items: []
+        });
+        
+        // Save to localStorage
+        localStorage.setItem('categories', JSON.stringify(categories));
+        
+        // Update UI
+        displayCategories();
+        populateCategorySelect();
+        
+        // Reset form and close modal
+        document.getElementById('category-name').value = '';
+        ModalManager.close();
+        
+        showToast('Category added successfully');
     }
-    
-    if (categories.includes(categoryName)) {
-        showToast('Category already exists!', 'warning');
-        return;
-    }
-
-    // Add the category to both state and localStorage
-    categories = [...categories, categoryName];
-    localStorage.setItem('categories', JSON.stringify(categories));
-    
-    // Update UI elements
-    populateCategorySelect();
-    displayMenuItems();
-    
-    // Show success message in modal
-    const modalContent = document.querySelector('.modal-content');
-    modalContent.innerHTML = `
-        <div class="success-message">
-            <i class="fas fa-check-circle"></i>
-            <h4>Category Added!</h4>
-            <p>The category "${categoryName}" has been added successfully.</p>
-            <button onclick="closeModal()" class="btn primary">Done</button>
-        </div>
-    `;
-
-    // Auto close after 2 seconds
-    setTimeout(() => {
-        closeModal();
-        // Reset the modal content after it's closed
-        setTimeout(() => {
-            modalContent.innerHTML = `
-                <h3>Add Category</h3>
-                <form id="category-form">
-                    <div class="form-group">
-                        <label for="category-name">Category Name</label>
-                        <input type="text" id="category-name" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn primary">Add Category</button>
-                </form>
-            `;
-            // Reattach event listener to the new form
-            document.getElementById('category-form').addEventListener('submit', categoryForm.onsubmit);
-        }, 300);
-    }, 2000);
 });
 
 // Site Settings Management
 const defaultSettings = {
     restaurant: {
-        name: 'Restaurant Name',
-        tagline: 'Experience culinary excellence'
+        name: 'Bistro Cascade',
+        tagline: 'Modern American Cuisine'
     },
     contact: {
         phone: '(555) 123-4567',
-        email: 'info@restaurant.com',
-        address: '123 Main St'
+        email: 'info@bistrocascade.com',
+        address: '123 Main Street, Anytown, USA'
     },
     hours: {
         monday: { open: '11:30', close: '22:00' },
@@ -997,12 +981,23 @@ const defaultSettings = {
         friday: { open: '11:30', close: '23:00' },
         saturday: { open: '11:30', close: '23:00' },
         sunday: { open: '11:30', close: '21:00' }
+    },
+    story: {
+        title: 'Our Story',
+        lead: 'A Culinary Journey',
+        content: 'Founded in 2020, Bistro Cascade brings together traditional flavors and modern techniques. Our chefs are passionate about creating memorable dining experiences using locally-sourced ingredients.'
     }
 };
 
-// Load settings from localStorage
+// Load site settings with defaults
 function loadSiteSettings() {
-    return JSON.parse(localStorage.getItem('siteSettings')) || defaultSettings;
+    const savedSettings = localStorage.getItem('siteSettings');
+    if (!savedSettings) {
+        // If no settings exist, use defaults
+        saveSiteSettings(defaultSettings);
+        return defaultSettings;
+    }
+    return JSON.parse(savedSettings);
 }
 
 // Save settings to localStorage
@@ -1015,52 +1010,220 @@ function saveSiteSettings(settings) {
 // Update site content with new settings
 function updateSiteContent() {
     const settings = loadSiteSettings();
-    document.title = settings.restaurant.name + ' - Admin Panel';
-    // Update other elements when needed
+    
+    // Update page title and nav brand
+    document.title = settings.restaurant.name;
+    const navBrand = document.querySelector('.nav-brand');
+    if (navBrand) {
+        navBrand.textContent = settings.restaurant.name;
+    }
+    
+    // Update hero section
+    const heroTitle = document.querySelector('.hero-content h1');
+    const heroTagline = document.querySelector('.hero-content p');
+    if (heroTitle) {
+        heroTitle.textContent = settings.restaurant.name;
+    }
+    if (heroTagline) {
+        heroTagline.textContent = settings.restaurant.tagline;
+    }
+    
+    // Update contact information
+    const phoneElement = document.querySelector('.contact-box .fa-phone')?.parentElement;
+    const emailElement = document.querySelector('.contact-box .fa-envelope')?.parentElement;
+    const addressElement = document.querySelector('.contact-box .fa-map-marker-alt')?.parentElement;
+    
+    if (phoneElement) {
+        phoneElement.innerHTML = `<i class="fas fa-phone"></i> ${settings.contact.phone}`;
+    }
+    if (emailElement) {
+        emailElement.innerHTML = `<i class="fas fa-envelope"></i> ${settings.contact.email}`;
+    }
+    if (addressElement) {
+        addressElement.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${settings.contact.address}`;
+    }
+    
+    // Update business hours
+    const hoursList = document.querySelector('.hours-list');
+    if (hoursList && settings.hours) {
+        const daysMap = {
+            monday: 'Monday',
+            tuesday: 'Tuesday',
+            wednesday: 'Wednesday',
+            thursday: 'Thursday',
+            friday: 'Friday',
+            saturday: 'Saturday',
+            sunday: 'Sunday'
+        };
+        
+        let hoursHTML = '';
+        Object.entries(settings.hours).forEach(([day, times]) => {
+            if (times.open && times.close) {
+                hoursHTML += `<li><span>${daysMap[day]}:</span> ${formatTime(times.open)} - ${formatTime(times.close)}</li>`;
+            }
+        });
+        
+        if (hoursHTML) {
+            hoursList.innerHTML = hoursHTML;
+        }
+    }
 }
 
-// Initialize hours inputs
+// Function to format time in 12-hour format
+function formatTime(time) {
+    if (!time) return '';
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+}
+
+// Function to format time for input fields
+function formatTimeForInput(time) {
+    if (!time) return '';
+    const [hours, minutes] = time.split(':');
+    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+}
+
+// Initialize hours inputs with default values
 function initializeHours() {
+    console.log('Initializing hours...');
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const container = document.getElementById('hours-container');
-    container.innerHTML = ''; // Clear existing content
+    const settings = loadSiteSettings();
+    
+    if (!container) {
+        console.error('Hours container not found!');
+        return;
+    }
 
+    container.innerHTML = ''; // Clear existing content
+    
     days.forEach(day => {
+        const hours = settings.hours[day] || { open: '11:30', close: '22:00' };
         const row = document.createElement('div');
         row.className = 'hours-row';
         row.innerHTML = `
             <label>${day.charAt(0).toUpperCase() + day.slice(1)}</label>
-            <input type="time" class="form-control time-input" data-day="${day}" data-type="open" required>
-            <span>to</span>
-            <input type="time" class="form-control time-input" data-day="${day}" data-type="close" required>
+            <div class="time-inputs">
+                <div class="time-input-wrapper">
+                    <input type="time" 
+                           class="form-control time-input" 
+                           id="${day}-open"
+                           value="${hours.open}"
+                           required>
+                    <button type="button" 
+                            class="time-picker-trigger" 
+                            data-input="${day}-open"
+                            onclick="showTimePicker(this)">🕒</button>
+                </div>
+                <span>to</span>
+                <div class="time-input-wrapper">
+                    <input type="time" 
+                           class="form-control time-input" 
+                           id="${day}-close"
+                           value="${hours.close}"
+                           required>
+                    <button type="button" 
+                            class="time-picker-trigger" 
+                            data-input="${day}-close"
+                            onclick="showTimePicker(this)">🕒</button>
+                </div>
+            </div>
         `;
         container.appendChild(row);
     });
 }
 
-// Populate form with current settings
-function populateSettingsForm() {
-    const settings = loadSiteSettings();
-    
-    // Restaurant info
-    document.getElementById('restaurant-name').value = settings.restaurant.name;
-    document.getElementById('restaurant-tagline').value = settings.restaurant.tagline;
-    
-    // Contact info
-    document.getElementById('restaurant-phone').value = settings.contact.phone;
-    document.getElementById('restaurant-email').value = settings.contact.email;
-    document.getElementById('restaurant-address').value = settings.contact.address;
-    
-    // Hours
-    Object.entries(settings.hours).forEach(([day, times]) => {
-        const openInput = document.querySelector(`input[data-day="${day}"][data-type="open"]`);
-        const closeInput = document.querySelector(`input[data-day="${day}"][data-type="close"]`);
-        if (openInput && closeInput) {
-            openInput.value = times.open;
-            closeInput.value = times.close;
+// Simple function to show time picker
+function showTimePicker(button) {
+    try {
+        console.log('showTimePicker called');
+        const inputId = button.getAttribute('data-input');
+        console.log('Input ID:', inputId);
+        
+        if (!inputId) {
+            console.error('No input ID found on button');
+            return;
         }
-    });
+
+        const wrapper = button.closest('.time-input-wrapper');
+        if (!wrapper) {
+            console.error('Could not find wrapper');
+            return;
+        }
+
+        // Remove any existing picker
+        const existingPicker = document.querySelector('.time-picker-popup');
+        if (existingPicker) {
+            console.log('Removing existing picker');
+            existingPicker.remove();
+        }
+
+        // Create time picker
+        const picker = document.createElement('div');
+        picker.className = 'time-picker-popup';
+        
+        // Add common times
+        const commonTimes = [
+            '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
+            '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+            '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30',
+            '21:00', '21:30', '22:00', '22:30', '23:00', '23:30'
+        ];
+        
+        let pickerHTML = '<div class="time-options">';
+        commonTimes.forEach(time => {
+            const [hours, minutes] = time.split(':');
+            const hour = parseInt(hours);
+            const displayHour = hour % 12 || 12;
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayTime = `${displayHour}:${minutes} ${ampm}`;
+            pickerHTML += `
+                <div class="time-option" data-value="${time}">
+                    ${displayTime}
+                </div>
+            `;
+        });
+        pickerHTML += '</div>';
+        picker.innerHTML = pickerHTML;
+        
+        // Insert picker after the input
+        wrapper.appendChild(picker);
+        console.log('Picker added to wrapper:', wrapper);
+
+        // Add click handlers
+        picker.addEventListener('click', (e) => {
+            const option = e.target.closest('.time-option');
+            if (option) {
+                const value = option.getAttribute('data-value');
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.value = value;
+                    picker.remove();
+                }
+            }
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', function closePicker(e) {
+            if (!picker.contains(e.target) && e.target !== button) {
+                picker.remove();
+                document.removeEventListener('click', closePicker);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in showTimePicker:', error);
+    }
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing hours...');
+    initializeHours();
+});
 
 // Handle settings form submission
 document.getElementById('settings-form').addEventListener('submit', (e) => {
@@ -1076,7 +1239,12 @@ document.getElementById('settings-form').addEventListener('submit', (e) => {
             email: document.getElementById('restaurant-email').value,
             address: document.getElementById('restaurant-address').value
         },
-        hours: {}
+        hours: {},
+        story: {
+            title: document.getElementById('story-title').value,
+            lead: document.getElementById('story-lead').value,
+            content: document.getElementById('story-content').value
+        }
     };
     
     // Collect hours
@@ -1084,30 +1252,91 @@ document.getElementById('settings-form').addEventListener('submit', (e) => {
     days.forEach(day => {
         const openInput = document.querySelector(`input[data-day="${day}"][data-type="open"]`);
         const closeInput = document.querySelector(`input[data-day="${day}"][data-type="close"]`);
-        settings.hours[day] = {
-            open: openInput.value,
-            close: closeInput.value
-        };
+        
+        if (openInput && closeInput) {
+            settings.hours[day] = {
+                open: openInput.value,
+                close: closeInput.value
+            };
+        }
     });
     
     saveSiteSettings(settings);
+    updateHoursDisplay();
+    showToast('Settings saved successfully');
     closeSettingsModal();
 });
 
-// Modal management
-function openSettingsModal() {
-    populateSettingsForm();
-    ModalManagerOriginal.show('settings-modal');
+// Populate form with current settings
+function populateSettingsForm() {
+    const settings = loadSiteSettings();
+    
+    // Restaurant info
+    document.getElementById('restaurant-name').value = settings.restaurant.name || '';
+    document.getElementById('restaurant-tagline').value = settings.restaurant.tagline || '';
+    
+    // Story section
+    document.getElementById('story-title').value = settings.story.title || '';
+    document.getElementById('story-lead').value = settings.story.lead || '';
+    document.getElementById('story-content').value = settings.story.content || '';
+    
+    // Contact info
+    document.getElementById('restaurant-phone').value = settings.contact.phone || '';
+    document.getElementById('restaurant-email').value = settings.contact.email || '';
+    document.getElementById('restaurant-address').value = settings.contact.address || '';
+    
+    // Initialize hours
+    initializeHours();
 }
 
-function closeSettingsModal() {
-    ModalManagerOriginal.close();
-}
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Modal close buttons
+    document.querySelectorAll('.modal-close').forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            if (modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
 
-// Add click handler for settings button
-document.getElementById('site-settings-btn').addEventListener('click', openSettingsModal);
+    // Close modal when clicking outside
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
 
-// Initialize settings if not exists
-if (!localStorage.getItem('siteSettings')) {
-    saveSiteSettings(defaultSettings);
+    // Close time picker when clicking outside
+    document.addEventListener('click', (e) => {
+        const timePicker = document.querySelector('.time-picker-popup');
+        if (timePicker && !timePicker.contains(e.target) && 
+            !e.target.classList.contains('time-picker-trigger') && 
+            !e.target.classList.contains('time-input')) {
+            timePicker.remove();
+        }
+    });
+});
+
+// Update front-end hours display
+function updateHoursDisplay() {
+    const settings = loadSiteSettings();
+    const hoursList = document.querySelector('.hours-list');
+    
+    if (!hoursList || !settings.hours) return;
+    
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    let hoursHTML = '';
+    
+    days.forEach(day => {
+        const hours = settings.hours[day];
+        if (hours && hours.open && hours.close) {
+            hoursHTML += `<li><span>${day.charAt(0).toUpperCase() + day.slice(1)}:</span> ${formatTime(hours.open)} - ${formatTime(hours.close)}</li>`;
+        }
+    });
+    
+    hoursList.innerHTML = hoursHTML;
 }
