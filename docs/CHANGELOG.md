@@ -27,6 +27,11 @@
 - Settings persistence
 - Edge case handling in time inputs
 - Settings synchronization issues
+- Database loading on first CMS load
+- LocalStorage availability detection
+- Private/incognito mode handling
+- Storage operations error handling
+- Git command accessibility in VS Code
 
 ## [1.0.0] - 2024-12-11
 
