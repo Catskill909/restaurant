@@ -46,12 +46,19 @@ async function checkPassword() {
         const token = generateSessionToken();
         const expiry = Date.now() + CONFIG.SESSION_DURATION;
         
+        // Try sessionStorage instead of localStorage for private mode
         sessionStorage.setItem('adminToken', token);
         sessionStorage.setItem('sessionExpiry', expiry.toString());
-        localStorage.setItem('adminAuthenticated', 'true');
+        
+        // Only try to set localStorage if available
+        if (StorageManager.isAvailable) {
+            localStorage.setItem('adminAuthenticated', 'true');
+        }
         
         document.getElementById('loginOverlay').style.display = 'none';
-        showToast('Login successful', 'success');
+        
+        // Initialize components after successful login
+        initializeComponents();
         return true;
     } else {
         loginAttempts++;
@@ -294,8 +301,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // State Management
-let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
-let categories = JSON.parse(localStorage.getItem('categories')) || [];
+const StorageManager = {
+    isAvailable: false,
+    
+    checkAvailability() {
+        try {
+            const testKey = '__test__';
+            localStorage.setItem(testKey, testKey);
+            localStorage.removeItem(testKey);
+            this.isAvailable = true;
+            return true;
+        } catch (e) {
+            this.isAvailable = false;
+            console.warn('localStorage is not available:', e);
+            return false;
+        }
+    },
+    
+    getItem(key, defaultValue = []) {
+        if (!this.isAvailable) return defaultValue;
+        try {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : defaultValue;
+        } catch (e) {
+            console.error(`Error getting ${key} from localStorage:`, e);
+            return defaultValue;
+        }
+    },
+    
+    setItem(key, value) {
+        if (!this.isAvailable) {
+            showToast('Warning: Changes will not persist in private/incognito mode', 'warning');
+            return false;
+        }
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch (e) {
+            console.error(`Error saving ${key} to localStorage:`, e);
+            showToast('Error saving changes. Storage might be full.', 'error');
+            return false;
+        }
+    }
+};
+
+// Initialize storage check
+StorageManager.checkAvailability();
+
+let menuItems = StorageManager.getItem('menuItems', []);
+let categories = StorageManager.getItem('categories', []);
 let editingId = null;
 let draggedItem = null;
 let draggedCategory = null;
@@ -350,7 +404,7 @@ menuForm.addEventListener('submit', async (e) => {
     }
 
     // Save and reset
-    localStorage.setItem('menuItems', JSON.stringify(menuItems));
+    StorageManager.setItem('menuItems', menuItems);
     
     // Trigger storage event for other windows
     const event = new Event('storage');
@@ -460,7 +514,7 @@ function displayCategories() {
     const saveBtn = document.getElementById('saveCategoriesBtn');
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
-            localStorage.setItem('categories', JSON.stringify(categories));
+            StorageManager.setItem('categories', categories);
             populateCategorySelect();
             displayMenuItems();
             closeModal();
@@ -515,7 +569,7 @@ function editMenuItem(id) {
 function deleteMenuItem(id) {
     if (confirm('Are you sure you want to delete this item?')) {
         menuItems = menuItems.filter(item => item.id !== id);
-        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+        StorageManager.setItem('menuItems', menuItems);
         
         // Trigger storage event for other windows
         const event = new Event('storage');
@@ -532,7 +586,7 @@ function deleteMenuItem(id) {
 function handleDeleteCategory(category) {
     if (confirm(`Delete category "${category}"? This will not delete the items in this category.`)) {
         categories = categories.filter(c => c !== category);
-        localStorage.setItem('categories', JSON.stringify(categories));
+        StorageManager.setItem('categories', categories);
         populateCategorySelect();
         displayCategories();
         showToast('Category deleted successfully!', 'success');
@@ -540,7 +594,7 @@ function handleDeleteCategory(category) {
 }
 
 function handleSaveCategories() {
-    localStorage.setItem('categories', JSON.stringify(categories));
+    StorageManager.setItem('categories', categories);
     populateCategorySelect();
     displayMenuItems();
     closeModal();
@@ -671,7 +725,7 @@ function handleCategoryDrop(e) {
     
     // Update display and save
     displayCategories();
-    localStorage.setItem('categories', JSON.stringify(categories));
+    StorageManager.setItem('categories', categories);
     showToast('Category order updated', 'success');
 }
 
@@ -840,7 +894,7 @@ function handleDrop(e) {
     }
 
     // Update localStorage and refresh display
-    localStorage.setItem('menuItems', JSON.stringify(menuItems));
+    StorageManager.setItem('menuItems', menuItems);
     displayMenuItems();
 }
 
@@ -948,7 +1002,7 @@ document.getElementById('category-form').addEventListener('submit', (e) => {
         });
         
         // Save to localStorage
-        localStorage.setItem('categories', JSON.stringify(categories));
+        StorageManager.setItem('categories', categories);
         
         // Update UI
         displayCategories();
@@ -991,18 +1045,18 @@ const defaultSettings = {
 
 // Load site settings with defaults
 function loadSiteSettings() {
-    const savedSettings = localStorage.getItem('siteSettings');
+    const savedSettings = StorageManager.getItem('siteSettings');
     if (!savedSettings) {
         // If no settings exist, use defaults
         saveSiteSettings(defaultSettings);
         return defaultSettings;
     }
-    return JSON.parse(savedSettings);
+    return savedSettings;
 }
 
 // Save settings to localStorage
 function saveSiteSettings(settings) {
-    localStorage.setItem('siteSettings', JSON.stringify(settings));
+    StorageManager.setItem('siteSettings', settings);
     showToast('Settings saved successfully');
     updateSiteContent();
 }
@@ -1339,4 +1393,24 @@ function updateHoursDisplay() {
     });
     
     hoursList.innerHTML = hoursHTML;
+}
+
+// Add a function to initialize components
+async function initializeComponents() {
+    try {
+        await Promise.all([
+            displayMenuItems(),
+            displayCategories(),
+            populateCategorySelect(),
+            initializeHours()
+        ]);
+        
+        // Show storage warning if in private mode
+        if (!StorageManager.isAvailable) {
+            showToast('Private/Incognito Mode: Changes will not be saved', 'warning');
+        }
+    } catch (error) {
+        console.error('Error initializing components:', error);
+        showToast('Error loading content. Please try again.', 'error');
+    }
 }
