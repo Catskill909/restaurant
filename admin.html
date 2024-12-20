@@ -480,5 +480,33 @@
     </div>
 
     <script src="admin.js"></script>
+    <script src="js/settings.js"></script>
+    <script>
+        // Handle settings form submission
+        document.getElementById('settings-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                restaurantName: document.getElementById('restaurant-name').value,
+                tagline: document.getElementById('restaurant-tagline').value,
+                // We'll add more fields later as needed
+            };
+            Settings.save(formData);
+            // Close modal after saving
+            document.getElementById('settings-modal').style.display = 'none';
+        });
+
+        // Load existing settings into form
+        document.addEventListener('DOMContentLoaded', function() {
+            const settings = Settings.load();
+            if (settings) {
+                if (settings.restaurantName) {
+                    document.getElementById('restaurant-name').value = settings.restaurantName;
+                }
+                if (settings.tagline) {
+                    document.getElementById('restaurant-tagline').value = settings.tagline;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
