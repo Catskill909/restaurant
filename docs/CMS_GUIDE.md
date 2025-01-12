@@ -9,6 +9,8 @@
 - Time picker implementation for business hours
 - Settings modal structure
 - Dark theme styling
+- Static site generation with image animations
+- Admin interface removal in static build
 
 ### Pending Tasks
 
@@ -39,6 +41,13 @@
 - Form field validation incomplete
 - Settings not persisting to front-end
 
+## Static Site Generation
+To generate a static version of the site:
+1. Make your changes in the CMS
+2. Run `node static-generator.js` from the command line
+3. The static site will be generated in the `/static-site` folder
+4. All CMS features will be removed from the static build
+
 ## Development Notes
 
 ### File Structure
@@ -49,6 +58,8 @@ restaurant/
 ├── admin.css       # CMS styling
 ├── index.html      # Main site
 ├── styles.css      # Main site styling
+├── static-generator.js  # Static site generator
+├── static-site/    # Generated static files
 └── docs/
     └── CMS_GUIDE.md
 ```
@@ -86,3 +97,9 @@ siteSettings: {
 3. Make initial commit
 4. Create development branch
 5. Push to remote repository
+
+### Additional Notes
+- The CMS uses localStorage for data management
+- Static site generator creates a complete static version without CMS features
+- Admin interface is automatically removed in static builds
+- Image animations and transitions are preserved in static version
